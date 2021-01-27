@@ -47,9 +47,25 @@ add_subdirectory(src)
 # The executable code is here
 add_subdirectory(apps)
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
+
 # Testing only available if this is the main app
-# Emergency override MODERN_CMAKE_BUILD_TESTING provided as well
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
    AND BUILD_TESTING)
-  add_subdirectory(tests)
+    enable_testing()
+    include(GoogleTest)
+    add_subdirectory(tests)
 endif()
+
+# The next line is optional, but keeps your CACHE cleaner
+mark_as_advanced(
+    BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+    gmock_build_tests gtest_build_samples gtest_build_tests
+    gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+)
+
+# Also keeping IDEs that support folders clean
+set_target_properties(gtest PROPERTIES FOLDER extern)
+set_target_properties(gtest_main PROPERTIES FOLDER extern)
+set_target_properties(gmock PROPERTIES FOLDER extern)
+set_target_properties(gmock_main PROPERTIES FOLDER extern)

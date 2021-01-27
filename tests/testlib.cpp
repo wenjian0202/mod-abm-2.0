@@ -1,11 +1,12 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
 #include <mod/lib.hpp>
 
-TEST_CASE( "Quick check", "[main]" ) {
-    std::vector<double> values {1, 2., 3.};
+#include <gtest/gtest.h>
+
+TEST(Dummy, Dummy)
+{
+    std::vector<double> values{1, 2., 3.};
     auto [mean, moment] = accumulate_vector(values);
 
-    REQUIRE( mean == 2.0 );
-    REQUIRE( moment == Approx(4.666666) );
+    ASSERT_EQ(mean, 2.0);
+    ASSERT_EQ(moment, 3.0);
 }

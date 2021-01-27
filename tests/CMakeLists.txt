@@ -1,20 +1,20 @@
-# Testing library
-FetchContent_Declare(
-  catch
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG v2.9.1)
-FetchContent_MakeAvailable(catch)
-# Adds Catch2::Catch2
+# macro
+macro(package_add_test TESTNAME FILES LIBRARIES)
+    # create an exectuable in which the tests will be stored
+    add_executable(${TESTNAME} ${FILES})
 
-# Tests need to be added as executables first
-add_executable(testlib testlib.cpp)
+    # link the Google test infrastructure, mocking library, and a default main fuction to the test executable. Also include user-defined libraries.
+    target_link_libraries(${TESTNAME} gtest gmock gtest_main ${LIBRARIES})
 
-# I'm using C++17 in the test
-target_compile_features(testlib PRIVATE cxx_std_17)
+    # gtest_discover_tests replaces gtest_add_tests,
+    # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+    gtest_discover_tests(${TESTNAME}
+        # set a working directory so your project root so that you can find test data via paths relative to the project root
+        WORKING_DIRECTORY ${PROJECT_DIR}
+        PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+    )
 
-# Should be linked to the main library, as well as the Catch2 testing library
-target_link_libraries(testlib PRIVATE mod Catch2::Catch2)
+    set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+endmacro()
 
-# If you register a test, then ctest and make test will run it.
-# You can also run examples and check the output, as well.
-add_test(NAME testlibtest COMMAND testlib) # Command can be a target
+package_add_test(testlib testlib.cpp mod)
