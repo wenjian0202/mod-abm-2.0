@@ -13,7 +13,7 @@ add_executable(testlib testlib.cpp)
 target_compile_features(testlib PRIVATE cxx_std_17)
 
 # Should be linked to the main library, as well as the Catch2 testing library
-target_link_libraries(testlib PRIVATE mod-abm Catch2::Catch2)
+target_link_libraries(testlib PRIVATE mod Catch2::Catch2)
 
 # If you register a test, then ctest and make test will run it.
 # You can also run examples and check the output, as well.

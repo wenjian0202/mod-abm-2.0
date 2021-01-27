@@ -1,4 +1,4 @@
-#include <mod-abm/lib.hpp>
+#include <mod/lib.hpp>
 
 #include <fmt/format.h>
 

@@ -3,6 +3,7 @@ build/
 
 # Visual Studio files
 .vs
+.vscode
 *.sdf
 *.opensdf
 *.VC.opendb

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.11...3.19)
 
 # Project name and a few useful settings. Other commands can pick up the results
 project(
-  mod-abm
+  mod-abm-2.0
   VERSION 0.1
   DESCRIPTION "An agent-based modeling platform for mobility-on-demand simulations"
   LANGUAGES CXX)
