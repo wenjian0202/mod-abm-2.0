@@ -1,18 +1,17 @@
-#include <mod/lib.hpp>
+#include <mod/router.hpp>
+#include <mod/dispatcher.hpp>
 
 #include <fmt/format.h>
 
 #include <iostream>
-#include <vector>
-#include <tuple>
 
 int main()
 {
-    std::vector<double> input = {1.2, 2.3, 3.4, 4.5};
+    Router router;
 
-    auto [mean, moment] = accumulate_vector(input);
+    auto dispatcher = [&router](const int trip, const int vehicle){ return assign_trips_to_vehicles(trip, vehicle, router); };
 
-    fmt::print("Mean: {}, Moment: {}\n", mean, moment);
+    fmt::print("first: {}, second: {}, thrid: {}\n", dispatcher(0, 0), dispatcher(0, 0), dispatcher(0, 0));
 
     return 0;
 }

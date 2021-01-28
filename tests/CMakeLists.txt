@@ -17,4 +17,4 @@ macro(package_add_test TESTNAME FILES LIBRARIES)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(testlib testlib.cpp mod)
+package_add_test(testlib types_test.cpp mod)
