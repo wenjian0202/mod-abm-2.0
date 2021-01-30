@@ -8,12 +8,20 @@ project(
   DESCRIPTION "An agent-based modeling platform for mobility-on-demand simulations"
   LANGUAGES CXX)
 
+########################################################################
+# Find External Packages
+########################################################################
+
 # Define the path to cmake files
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Find all required libraries including the OSRM-backend library(LibOSRM)
 find_package(LibOSRM REQUIRED)
 find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono date_time regex REQUIRED)
+
+########################################################################
+# Define Libraries and Executable
+########################################################################
 
 # The libraries
 add_library(model src/router.cpp)
@@ -26,6 +34,10 @@ target_link_libraries(main model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRAR
 link_directories(${LibOSRM_LIBRARY_DIRS})
 include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LibOSRM_CXXFLAGS}")
+
+########################################################################
+# Fetch Other Third-Party Libraries
+########################################################################
 
 # Third-party libraries
 include(FetchContent)
@@ -50,10 +62,31 @@ if(NOT googletest_POPULATED)
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
-# Set up tests
+# Add Google bekchmark suite
+FetchContent_Declare(
+  googlebenchmark
+  GIT_REPOSITORY https://github.com/google/benchmark.git
+  GIT_TAG        v1.5.2
+)
+FetchContent_GetProperties(googlebenchmark)
+if(NOT benchmark_POPULATED)
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
+  FetchContent_Populate(googlebenchmark)
+  add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR} EXCLUDE_FROM_ALL)
+  set(BENCHMARK_INCLUDE_DIR ${benchmark_SOURCE_DIR}/include)
+endif()
+
+
+########################################################################
+# Tests
+########################################################################
+
+# Enable testing
 enable_testing()
 include(GoogleTest)
 
+# Add executable for all test cases
 add_executable(model_test test/types_test.cpp test/router_test.cpp)
 target_link_libraries(model_test gtest gmock gtest_main model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
 gtest_discover_tests(model_test
@@ -62,3 +95,11 @@ gtest_discover_tests(model_test
         PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
     )
 set_target_properties(model_test PROPERTIES FOLDER tests)
+
+########################################################################
+# Benchmarks
+########################################################################
+
+#
+add_executable(router_benchmark benchmark/router_benchmark.cpp)
+target_link_libraries(router_benchmark benchmark::benchmark model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})

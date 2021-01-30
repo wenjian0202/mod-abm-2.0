@@ -60,8 +60,6 @@ int Router::operator()(const Pos &origin, const Pos &destination)
             std::cout << "You are probably doing a query outside of the OSM extract.\n\n";
         }
 
-        std::cout << "Distance: " << distance << " meter\n";
-        std::cout << "Duration: " << duration << " seconds\n";
         return 1;
     }
     else if (status == osrm::Status::Error)
@@ -73,4 +71,6 @@ int Router::operator()(const Pos &origin, const Pos &destination)
         std::cout << "Message: " << code << "\n";
         return 0;
     }
+
+    return -1;
 }
