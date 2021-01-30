@@ -14,9 +14,10 @@ An agent-based modeling platform for mobility-on-demand simulations. **WORK IN P
 - support design and operational decisions (such as fleet size, pricing policies) for MoD systems, shared or non-shared, autonomous or non-autonomous;
 - model traveler behavior and traffic demand;
 - research smart dispatch algorithms w.r.t trip-vehicle assignment, fleet management, and rebalancing, including machine-learning models.
+
 Almost effortlessly, this software could be transfered to any urban setting for fast simulation of city-level operations. The larged decoupled system also lends itself to customized extensions according to developers' own needs. You're all welcome to contribute to `mod-abm-2.0`! 
 
-## what is included?
+## `mod-abm-2.0` Explained
 
 In construction.
 
