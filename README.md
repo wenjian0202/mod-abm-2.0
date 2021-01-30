@@ -1,7 +1,7 @@
 # `mod-abm-2.0`
 An agent-based modeling platform for mobility-on-demand simulations. **WORK IN PROGRESS**.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/master/media/demo.gif" width="400">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="400">
 
 ## What's `mod-abm-2.0`?
 
