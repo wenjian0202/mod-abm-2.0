@@ -1,0 +1,21 @@
+# The set of config parameters for the simulation platform.
+# See src/types.hpp for detailed definitions.
+
+# We use Hong Kong as our case study.
+area_config: 
+  lon_min: 113.75
+  lon_max: 114.50
+  lat_min: 22.10
+  lat_max: 22.60
+mod_system_config:
+  fleet_config:
+    fleet_size: 10
+    veh_capacity: 2
+  request_config:
+    walkaway_time_s: 600
+simulation_config:
+  cycle_s: 30.0
+  simulation_duration_s: 3600
+  warmup_duration_s: 1800
+  winddown_duration_s: 1800
+path_to_osrm_data: "../osrm/data/china-latest.osrm"

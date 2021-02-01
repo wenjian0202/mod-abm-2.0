@@ -24,11 +24,12 @@ find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono d
 ########################################################################
 
 # The libraries
-add_library(model src/router.cpp)
+add_library(model src/types.cpp src/router.cpp)
+target_link_libraries(model yaml-cpp fmt::fmt)
 
 # The executable
 add_executable(main src/main.cpp)
-target_link_libraries(main model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+target_link_libraries(main model yaml-cpp fmt::fmt ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
 
 # More linking for LibOSRM
 link_directories(${LibOSRM_LIBRARY_DIRS})
@@ -49,6 +50,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
   GIT_TAG 5.3.0)
 FetchContent_MakeAvailable(fmtlib)
+
+# Add YAML
+FetchContent_Declare(
+  yaml-cpp
+  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+  GIT_TAG yaml-cpp-0.6.3)
+FetchContent_MakeAvailable(yaml-cpp)
 
 # Add Google test suite
 FetchContent_Declare(
