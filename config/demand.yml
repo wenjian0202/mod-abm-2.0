@@ -1,0 +1,46 @@
+# The demand Origin-Destination pairs and trip intensities for the simulation platform.
+# Example OD:
+# - origin:
+#     lon: 
+#     lat: 
+#   destination:
+#     lon: 
+#     lat:
+#   trips_per_hour: 
+
+# We use Hong Kong as our case study.
+- origin:
+    lon: 113.93593149478123 
+    lat: 22.312648328005512
+  destination:
+    lon: 114.13602296340699
+    lat: 22.28328541732128
+  trips_per_hour: 20
+- origin:
+    lon: 114.17369686735299
+    lat: 22.280087726045814
+  destination:
+    lon: 114.17561399009189
+    lat: 22.24800868991236
+  trips_per_hour: 20
+- origin:
+    lon: 114.17561399009189 
+    lat: 22.24800868991236
+  destination:
+    lon: 114.262956930406
+    lat: 22.33753862031669
+  trips_per_hour: 20
+- origin:
+    lon: 114.16483731906509
+    lat: 22.30443916576983
+  destination:
+    lon: 114.04481815787686
+    lat: 22.316095100200222
+  trips_per_hour: 20
+- origin:
+    lon: 114.19173653432514
+    lat: 22.28239638190739
+  destination:
+    lon: 114.1693718630225
+    lat: 22.319245660853035
+  trips_per_hour: 20

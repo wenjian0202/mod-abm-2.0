@@ -24,7 +24,7 @@ find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono d
 ########################################################################
 
 # The libraries
-add_library(model src/types.cpp src/router.cpp)
+add_library(model src/types.cpp src/config.cpp src/router.cpp src/demand_generator.cpp)
 target_link_libraries(model yaml-cpp fmt::fmt)
 
 # The executable

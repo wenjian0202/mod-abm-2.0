@@ -10,7 +10,7 @@
 #include <string>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-/// Basic Types
+/// Geo Types
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// \brief Position encoded in longitude/latitude.
@@ -66,55 +66,29 @@ struct RoutingResponse
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-/// Config Types
+/// Trip Types
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// \brief Config that describes the simulated area.
-struct AreaConfig
+/// \brief A single demand OD with accumulated probability.
+/// \details The accumulated probability of a OD is a double between (0, 1]. We use these to form
+/// a list of ODs with increasing probs to be able to generate a random request based on each OD's
+/// trip intensity. For example, the first OD has a probability of 0.1 among all trips and the
+/// accumulated prob will be 0.1. The second OD has a probability of 0.1 and the accumulated prob
+/// will be 0.2 (0.1 + 0.1). The third OD has a probability of 0.05 and the accumulated prob in
+/// this case will be 0.25 (0.2 + 0.05). To generate a trip, we generate a random number between
+/// 0 and 1. If the random number falls into [0.1, 0.2), the origin/destination of the generated
+/// trip will be based on the second OD.
+struct DemandOD
 {
-    double lon_min = 0.0; // max longitude accepted
-    double lon_max = 0.0; // min longitude accepted
-    double lat_min = 0.0; // max latitude accepted
-    double lat_max = 0.0; // min latitude accepted
+    Pos origin;
+    Pos destination;
+    double accumulated_prob;
 };
 
-/// \brief Config that describes the fleet.
-struct FleetConfig
+/// \brief The trip request represented by an OD pair and a request time.
+struct Request
 {
-    size_t fleet_size = 10;  // fleet size
-    size_t veh_capacity = 2; // vehicle capacity, 1 = non-shared, >2 is shared
+    Pos origin;
+    Pos destination;
+    double request_time_s = 0.0;
 };
-
-/// \brief Config that describes the requests.
-struct RequestConfig
-{
-    double walkaway_time_s = 600; // the time after which the requesting traveller will cancel the request
-};
-
-/// \brief Config that describes the target MoD system.
-struct MoDSystemConfig
-{
-    FleetConfig fleet_config;
-    RequestConfig request_config;
-};
-
-/// \brief Config that describes the simulation statistics.
-struct SimulationConfig
-{
-    double cycle_s = 30.0;               // the cycle every x second the platform dispatches the requests in batch
-    double simulation_duration_s = 3600; // the main period during which the simulated data are analyzed
-    double warmup_duration_s = 1800;     // the period before the main sim for system to build up states
-    double winddown_duration_s = 1800;   // the period after the main sim for system to close trips
-};
-
-/// \brief The set of config parameters for the simulation platform.
-struct PlatformConfig
-{
-    AreaConfig area_config;
-    MoDSystemConfig mod_system_config;
-    SimulationConfig simulation_config;
-    std::string path_to_osrm_data; // path to the base osrm map data
-};
-
-/// \brief Convert the loaded yaml platform config into the c++ data struct.
-PlatformConfig convert_yaml_to_platform_config(const YAML::Node &platform_config_yaml);

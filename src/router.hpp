@@ -14,13 +14,13 @@
 class Router
 {
 public:
-    /// @brief constructor.
+    /// @brief Constructor.
     explicit Router(std::string _path_to_osrm_data);
 
-    /// @brief main functor that finds the shortest route for an O/D pair on request.
+    /// @brief Main functor that finds the shortest route for an O/D pair on request.
     RoutingResponse operator()(const Pos &origin, const Pos &destination);
 
 private:
-    /// @brief the unique pointer to the osrm routing engine instance.
+    /// @brief The unique pointer to the osrm routing engine instance.
     std::unique_ptr<osrm::OSRM> osrm_ptr_;
 };

@@ -25,6 +25,8 @@ Router::Router(std::string _path_to_osrm_data)
 
     // Create the routing engine instance
     osrm_ptr_ = std::make_unique<osrm::OSRM>(config);
+
+    fmt::print("[INFO] Initiated the OSRM routing engine using map data from {}.\n", _path_to_osrm_data);
 }
 
 RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
@@ -37,10 +39,10 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
     params.coordinates.push_back({osrm::util::FloatLongitude{destination.lon}, osrm::util::FloatLatitude{destination.lat}});
 
     // Set up other params
-    params.steps = true;                                                 // returns the detailed steps of the route
-    params.alternatives = false;                                         // no alternative routes, just find the best one
+    params.steps = true;                                                // returns the detailed steps of the route
+    params.alternatives = false;                                        // no alternative routes, just find the best one
     params.geometries = osrm::RouteParameters::GeometriesType::GeoJSON; // route geometry encoded in GeoJSON
-    params.overview = osrm::RouteParameters::OverviewType::False;        // no route overview
+    params.overview = osrm::RouteParameters::OverviewType::False;       // no route overview
 
     // Response is in JSON format
     osrm::engine::api::ResultT result = osrm::json::Object();
@@ -84,12 +86,12 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
 
         return response;
     }
-    
+
     const auto code = json_result.values["code"].get<osrm::json::String>().value;
     const auto message = json_result.values["message"].get<osrm::json::String>().value;
 
     response.status = RoutingStatus::ERROR;
     response.message = fmt::format("Code: {}, Message {}", code, message);
-        
+
     return response;
 }
