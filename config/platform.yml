@@ -18,4 +18,3 @@ simulation_config:
   simulation_duration_s: 3600
   warmup_duration_s: 1800
   winddown_duration_s: 1800
-path_to_osrm_data: "../osrm/data/china-latest.osrm"

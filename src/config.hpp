@@ -49,7 +49,6 @@ struct PlatformConfig
     AreaConfig area_config;
     MoDSystemConfig mod_system_config;
     SimulationConfig simulation_config;
-    std::string path_to_osrm_data; // path to the base osrm map data
 };
 
 /// \brief Load yaml platform config and convert into the c++ data struct.

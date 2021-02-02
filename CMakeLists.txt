@@ -24,12 +24,12 @@ find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono d
 ########################################################################
 
 # The libraries
-add_library(model src/types.cpp src/config.cpp src/router.cpp src/demand_generator.cpp)
-target_link_libraries(model yaml-cpp fmt::fmt)
+add_library(mod-abm src/types.cpp src/config.cpp src/router.cpp src/demand_generator.cpp)
+target_link_libraries(mod-abm yaml-cpp fmt::fmt)
 
 # The executable
 add_executable(main src/main.cpp)
-target_link_libraries(main model yaml-cpp fmt::fmt ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+target_link_libraries(main mod-abm yaml-cpp fmt::fmt ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
 
 # More linking for LibOSRM
 link_directories(${LibOSRM_LIBRARY_DIRS})
@@ -95,19 +95,19 @@ enable_testing()
 include(GoogleTest)
 
 # Add executable for all test cases
-add_executable(model_test test/types_test.cpp test/router_test.cpp)
-target_link_libraries(model_test gtest gmock gtest_main model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
-gtest_discover_tests(model_test
+add_executable(mod-abm_test test/types_test.cpp test/router_test.cpp)
+target_link_libraries(mod-abm_test gtest gmock gtest_main mod-abm ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+gtest_discover_tests(mod-abm_test
         # set a working directory so your project root so that you can find test data via paths relative to the project root
         WORKING_DIRECTORY ${PROJECT_DIR}
         PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
     )
-set_target_properties(model_test PROPERTIES FOLDER tests)
+set_target_properties(mod-abm_test PROPERTIES FOLDER tests)
 
 ########################################################################
 # Benchmarks
 ########################################################################
 
-#
+# Benchmarks
 add_executable(router_benchmark benchmark/router_benchmark.cpp)
-target_link_libraries(router_benchmark benchmark::benchmark model ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+target_link_libraries(router_benchmark benchmark::benchmark mod-abm ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})

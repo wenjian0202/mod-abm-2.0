@@ -26,8 +26,6 @@ PlatformConfig load_platform_config(const std::string &path_to_platform_config)
     platform_config.simulation_config.warmup_duration_s = platform_config_yaml["simulation_config"]["warmup_duration_s"].as<double>();
     platform_config.simulation_config.winddown_duration_s = platform_config_yaml["simulation_config"]["winddown_duration_s"].as<double>();
 
-    platform_config.path_to_osrm_data = platform_config_yaml["path_to_osrm_data"].as<std::string>();
-
     fmt::print("[INFO] Loaded the platform configuration yaml file from {}.\n", path_to_platform_config);
 
     return platform_config;

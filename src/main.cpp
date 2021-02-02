@@ -3,6 +3,7 @@
 
 #include "config.hpp"
 #include "demand_generator.hpp"
+#include "platform.hpp"
 #include "router.hpp"
 #include "types.hpp"
 
@@ -12,11 +13,14 @@
 int main(int argc, const char *argv[])
 {
     // Check the input arugment list
-    if (argc != 3)
+    if (argc != 4)
     {
-        fmt::print(stderr, "[ERROR] We need exact 2 arguments aside from the program name for correct execution! \n"
-                           "- Usage: <prog name> <arg1> <arg2>. The <arg1> is the path to the platform config file. The <arg2> is the path to the demand config file.\n"
-                           "- Example: {} \"./config/platform.yml\" \"./config/demand.yml\"\n",
+        fmt::print(stderr, "[ERROR] We need exact 3 arguments aside from the program name for correct execution! \n"
+                           "- Usage: <prog name> <arg1> <arg2> <arg3>. "
+                           "The <arg1> is the path to the platform config file. "
+                           "The <arg2> is the path to the orsm map data. "
+                           "The <arg3> is the path to the demand config file.\n"
+                           "- Example: {} \"./config/platform.yml\" \"../osrm/data/china-latest.osrm\" \"./config/demand.yml\"\n",
                    argv[0]);
         return -1;
     }
@@ -25,26 +29,21 @@ int main(int argc, const char *argv[])
     auto platform_config = load_platform_config(argv[1]);
 
     // Initiate the router with the osrm data
-    Router router{platform_config.path_to_osrm_data};
+    Router router{argv[2]};
 
-    // Load the demand for the demand generator
-    DemandGenerator demand_generator{argv[2], platform_config.simulation_config.cycle_s};
+    // Create the demand generator based on the input demand file
+    DemandGenerator demand_generator{argv[3], platform_config.simulation_config.cycle_s};
 
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
-    demand_generator();
+    // Create the simulation platform
+    Platform<decltype(router), decltype(demand_generator)> platform{std::move(platform_config), std::move(router), std::move(demand_generator)};
 
-    // Pos origin{113.93593149478123, 22.312648328005512};
-    // Pos destination{114.13602296340699, 22.28328541732128};
+    platform.invoke_demand_generator();
+    platform.invoke_demand_generator();
+    platform.invoke_demand_generator();
+    platform.invoke_demand_generator();
+    platform.invoke_demand_generator();
 
-    // auto ret = router(origin, destination);
+    platform.invoke_router();
 
     return 0;
 }
