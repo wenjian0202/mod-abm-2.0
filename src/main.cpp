@@ -32,18 +32,12 @@ int main(int argc, const char *argv[])
     Router router{argv[2]};
 
     // Create the demand generator based on the input demand file
-    DemandGenerator demand_generator{argv[3], platform_config.simulation_config.cycle_s};
+    DemandGenerator demand_generator{argv[3]};
 
     // Create the simulation platform
     Platform<decltype(router), decltype(demand_generator)> platform{std::move(platform_config), std::move(router), std::move(demand_generator)};
 
-    platform.invoke_demand_generator();
-    platform.invoke_demand_generator();
-    platform.invoke_demand_generator();
-    platform.invoke_demand_generator();
-    platform.invoke_demand_generator();
-
-    platform.invoke_router();
+    platform.run_simulation();
 
     return 0;
 }
