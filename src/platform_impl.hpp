@@ -41,7 +41,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
     // System time moves forward by a cycle.
     system_time_s_ += platform_config_.simulation_config.cycle_s;
 
-    fmt::print("[DEBUG] T = {}: Cycle {} is running.\n",
+    fmt::print("[INFO] T = {}: Cycle {} is running.\n",
                system_time_s_,
                static_cast<int>(system_time_s_ / platform_config_.simulation_config.cycle_s));
 
@@ -75,7 +75,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::dispatch()
                pending_trips_.size());
 
     // Assign pending trips to vehicles.
-    assign_trips_through_insertion_heuristics(pending_trips_, router_func_);
+    assign_trips_through_insertion_heuristics(pending_trips_, vehicles_, router_func_);
 
     // Reoptimize the assignments for better level of service.
     // (TODO)

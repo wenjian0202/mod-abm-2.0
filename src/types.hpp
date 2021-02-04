@@ -114,3 +114,33 @@ struct Trip
     double pickup_time_s = 0.0;
     double dropoff_time_s = 0.0;
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/// Vehicle Types
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// \brief The operation associated with a waypoint.
+enum class WaypointOp
+{
+    UNDEFINED, // uninitialized value
+    PICKUP,    // we pick up a trip at this waypoint
+    DROPOFF,   // we drop off a trip at this waypoint
+};
+
+/// \brief The waypoint represents a stop along the way when the vehicle serves trips.
+struct Waypoint
+{
+    Pos pos;
+    WaypointOp op;
+    const std::vector<Trip>::iterator trip;
+    Route route;
+};
+
+/// \brief The vehicle type that holds dispatched trips and waypoints.
+struct Vehicle
+{
+    Pos pos;
+    size_t capacity = 1;
+    size_t load = 0;
+    std::vector<Waypoint> waypoints = {};
+};

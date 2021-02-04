@@ -48,6 +48,9 @@ private:
     /// \brief The vector of trips created during the entire simulation process.
     std::vector<Trip> trips_ = {};
 
+    /// \brief The vector of trips created during the entire simulation process.
+    std::vector<Vehicle> vehicles_ = {};
+
     /// \brief The queue of iterators pointing to trips to be dispatched.
     std::queue<const std::vector<Trip>::iterator> pending_trips_ = {};
 };
