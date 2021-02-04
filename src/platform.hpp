@@ -52,7 +52,7 @@ private:
     std::vector<Vehicle> vehicles_ = {};
 
     /// \brief The queue of iterators pointing to trips to be dispatched.
-    std::queue<const std::vector<Trip>::iterator> pending_trips_ = {};
+    std::queue<size_t> pending_trip_ids_ = {};
 };
 
 // Implementation is put in a separate file for clarity and maintainability.

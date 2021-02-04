@@ -19,12 +19,15 @@ struct FleetConfig
 {
     size_t fleet_size = 10;  // fleet size
     size_t veh_capacity = 2; // vehicle capacity, 1 = non-shared, >2 is shared
+    double initial_lon = 0.0; // max longitude accepted
+    double initial_lat = 0.0; // min longitude accepted
 };
 
 /// \brief Config that describes the requests.
 struct RequestConfig
 {
-    double walkaway_time_s = 600; // the time after which the requesting traveller will cancel the request
+    double max_dispatch_wait_time_s = 60; // the max wait time allowed before a dispatching decision is made.
+    double max_pickup_wait_time_s = 600; // the max wait time allowed before a traveler is picked up.
 };
 
 /// \brief Config that describes the target MoD system.

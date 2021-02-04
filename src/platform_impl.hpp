@@ -17,6 +17,10 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(
       router_func_(std::move(_router_func)),
       demand_generator_func_(std::move(_demand_generator_func))
 {
+    // Initialize the fleet.
+    const auto &fleet_config = platform_config_.mod_system_config.fleet_config;
+    Vehicle vehicle{{fleet_config.initial_lon, fleet_config.initial_lat}, fleet_config.veh_capacity, 0, {}};
+    vehicles_ = std::vector<Vehicle>(fleet_config.fleet_size, vehicle);
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -53,14 +57,16 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
     {
         Trip trip;
 
+        trip.id = trips_.size();
         trip.origin = request.origin;
         trip.destination = request.destination;
-        trip.id = trips_.size();
         trip.status = TripStatus::REQUESTED;
         trip.request_time_s = request.request_time_s;
+        trip.max_dispatch_time_s = request.request_time_s + platform_config_.mod_system_config.request_config.max_dispatch_wait_time_s;
+        trip.max_pickup_time_s = request.request_time_s + platform_config_.mod_system_config.request_config.max_pickup_wait_time_s;
 
+        pending_trip_ids_.push(trips_.size());
         trips_.emplace_back(std::move(trip));
-        pending_trips_.push(std::prev(trips_.end()));
     }
 
     // Dispatch
@@ -72,10 +78,10 @@ void Platform<RouterFunc, DemandGeneratorFunc>::dispatch()
 {
     fmt::print("[DEBUG] T = {}: Dispatching {} pending trip(s) to vehicles.\n",
                system_time_s_,
-               pending_trips_.size());
+               pending_trip_ids_.size());
 
     // Assign pending trips to vehicles.
-    assign_trips_through_insertion_heuristics(pending_trips_, vehicles_, router_func_);
+    assign_trips_through_insertion_heuristics(pending_trip_ids_, trips_, vehicles_, system_time_s_, router_func_);
 
     // Reoptimize the assignments for better level of service.
     // (TODO)
