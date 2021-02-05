@@ -21,6 +21,16 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(
     const auto &fleet_config = platform_config_.mod_system_config.fleet_config;
     Vehicle vehicle{{fleet_config.initial_lon, fleet_config.initial_lat}, fleet_config.veh_capacity, 0, {}};
     vehicles_ = std::vector<Vehicle>(fleet_config.fleet_size, vehicle);
+
+    // Open the output datalog file.
+    fout_datalog.open("./datalog/datalog.yml"); 
+}
+
+template <typename RouterFunc, typename DemandGeneratorFunc>
+Platform<RouterFunc, DemandGeneratorFunc>::~Platform()
+{
+    // Initialize the fleet.
+    fout_datalog.close();
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -42,6 +52,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation()
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
 {
+    write_to_datalog();
+
     // System time moves forward by a cycle.
     system_time_s_ += platform_config_.simulation_config.cycle_s;
 
@@ -73,11 +85,49 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
     dispatch();
 }
 
-// template <typename RouterFunc, typename DemandGeneratorFunc>
-// void Platform<RouterFunc, DemandGeneratorFunc>::create_image()
-// {
-//     create_image();
-// }
+template <typename RouterFunc, typename DemandGeneratorFunc>
+void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
+{
+    YAML::Node node;
+    node["system_time_s"] = system_time_s_;
+
+    for (const auto& vehicle : vehicles_)
+    {
+        YAML::Node veh_node;
+
+        YAML::Node pos_node;
+        pos_node["lon"] = vehicle.pos.lon;
+        pos_node["lat"] = vehicle.pos.lat;
+        veh_node["pos"] = std::move(pos_node);
+
+        YAML::Node waypoints_node;
+        for (const auto& waypoint : vehicle.waypoints)
+        {
+            YAML::Node waypoint_node;
+            for (const auto& leg : waypoint.route.legs)
+            {
+                for (const auto& step : leg.steps)
+                {
+                    for (const auto& pos : step.poses)
+                    {
+                        YAML::Node leg_node;
+                        leg_node["lon"] = pos.lon;
+                        leg_node["lat"] = pos.lat;
+                        waypoint_node.push_back(std::move(leg_node));
+                    }
+                }
+            }
+            waypoints_node.push_back(std::move(waypoint_node));
+        }
+        veh_node["waypoints"] = std::move(waypoints_node);
+        node["vehicles"].push_back(std::move(veh_node));
+    }
+
+    YAML::Node node_wrapper;
+    node_wrapper.push_back(node);
+
+    fout_datalog << node_wrapper << std::endl;
+}
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::dispatch()

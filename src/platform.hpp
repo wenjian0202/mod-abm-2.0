@@ -6,6 +6,7 @@
 #include "config.hpp"
 #include "types.hpp"
 
+#include <fstream>
 #include <queue>
 
 /// \brief The agent-based modeling platform that simulates the mobility-on-demand systems.
@@ -16,6 +17,15 @@ public:
     /// \brief Constructor.
     explicit Platform(PlatformConfig _platform_config, RouterFunc _router_func, DemandGeneratorFunc _demand_generator_func);
 
+    /// \brief Destructor.
+    ~Platform();
+
+    /// \brief Delete the other constructors. Rule of five. 
+    Platform(const Platform& other) = delete;
+    Platform(Platform&& other) = delete;
+    Platform& operator=(const Platform& other) = delete;
+    Platform& operator=(Platform&& other) = delete;
+
     void run_simulation();
 
     // void invoke_demand_generator()
@@ -24,14 +34,14 @@ public:
     //     // Pos destination{114.13602296340699, 22.28328541732128};
 
     //     // auto ret = router_func_(origin, destination);
-
-    //     // demand_generator_func_(100);
     // }
 
 private:
     void run_cycle();
 
     void dispatch();
+
+    void write_to_datalog();
 
     /// \brief The set of config parameters for the simulation platform.
     PlatformConfig platform_config_;
@@ -53,6 +63,9 @@ private:
 
     /// \brief The queue of iterators pointing to trips to be dispatched.
     std::queue<size_t> pending_trip_ids_ = {};
+
+    /// \brief The ofstream that outputs to the datalog.
+    std::ofstream fout_datalog;
 };
 
 // Implementation is put in a separate file for clarity and maintainability.
