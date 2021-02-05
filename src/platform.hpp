@@ -15,7 +15,11 @@ class Platform
 {
 public:
     /// \brief Constructor.
-    explicit Platform(PlatformConfig _platform_config, RouterFunc _router_func, DemandGeneratorFunc _demand_generator_func);
+    explicit Platform(
+        PlatformConfig _platform_config, 
+        RouterFunc _router_func, 
+        DemandGeneratorFunc _demand_generator_func,
+        std::string path_to_datalog_file = "");
 
     /// \brief Destructor.
     ~Platform();
@@ -63,6 +67,9 @@ private:
 
     /// \brief The queue of iterators pointing to trips to be dispatched.
     std::queue<size_t> pending_trip_ids_ = {};
+
+    /// \brief The boolean indicating if we output datalog.
+    bool if_output_datalog = false;
 
     /// \brief The ofstream that outputs to the datalog.
     std::ofstream fout_datalog;

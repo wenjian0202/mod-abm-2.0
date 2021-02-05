@@ -10,8 +10,8 @@
 
 # We use Hong Kong as our case study.
 - origin:
-    lon: 113.93593149478123 
-    lat: 22.312648328005512
+    lon: 114.18437875843068
+    lat: 22.34511015090938
   destination:
     lon: 114.13602296340699
     lat: 22.28328541732128

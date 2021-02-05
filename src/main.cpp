@@ -13,14 +13,15 @@
 int main(int argc, const char *argv[])
 {
     // Check the input arugment list
-    if (argc != 4)
+    if (argc < 4 || argc > 5)
     {
-        fmt::print(stderr, "[ERROR] We need exact 3 arguments aside from the program name for correct execution! \n"
-                           "- Usage: <prog name> <arg1> <arg2> <arg3>. "
-                           "The <arg1> is the path to the platform config file. "
-                           "The <arg2> is the path to the orsm map data. "
-                           "The <arg3> is the path to the demand config file.\n"
-                           "- Example: {} \"./config/platform.yml\" \"../osrm/data/china-latest.osrm\" \"./config/demand.yml\"\n",
+        fmt::print(stderr, "[ERROR] We need 3 or 4 arguments aside from the program name for correct execution! \n"
+                           "- Usage: <prog name> <arg1> <arg2> <arg3> <arg4>. "
+                           "  <arg1> is the path to the platform config file. "
+                           "  <arg2> is the path to the orsm map data. "
+                           "  <arg3> is the path to the demand config file."
+                           "  <arg4> (optional) is the path to the output datalog file if we are to render video or do future data analysis.\n"
+                           "- Example: {} \"./config/platform.yml\" \"../osrm/data/china-latest.osrm\" \"./config/demand.yml\" \"./datalog/datalog.yml\"\n",
                    argv[0]);
         return -1;
     }
@@ -35,7 +36,11 @@ int main(int argc, const char *argv[])
     DemandGenerator demand_generator{argv[3]};
 
     // Create the simulation platform
-    Platform<decltype(router), decltype(demand_generator)> platform{std::move(platform_config), std::move(router), std::move(demand_generator)};
+    Platform<decltype(router), decltype(demand_generator)> platform{
+        std::move(platform_config), 
+        std::move(router), 
+        std::move(demand_generator),
+        argc == 5 ? argv[4] : ""};
 
     platform.run_simulation();
 

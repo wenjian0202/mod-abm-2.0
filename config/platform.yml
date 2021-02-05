@@ -3,10 +3,10 @@
 
 # We use Hong Kong as our case study.
 area_config: 
-  lon_min: 113.75
-  lon_max: 114.50
-  lat_min: 22.10
-  lat_max: 22.60
+  lon_min: 114.10
+  lon_max: 114.30
+  lat_min: 22.20
+  lat_max: 22.35
 mod_system_config:
   fleet_config:
     fleet_size: 5

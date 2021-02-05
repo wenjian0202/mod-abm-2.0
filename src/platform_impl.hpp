@@ -12,10 +12,12 @@ template <typename RouterFunc, typename DemandGeneratorFunc>
 Platform<RouterFunc, DemandGeneratorFunc>::Platform(
     PlatformConfig _platform_config,
     RouterFunc _router_func,
-    DemandGeneratorFunc _demand_generator_func)
+    DemandGeneratorFunc _demand_generator_func,
+    std::string path_to_datalog_file)
     : platform_config_(std::move(_platform_config)),
       router_func_(std::move(_router_func)),
-      demand_generator_func_(std::move(_demand_generator_func))
+      demand_generator_func_(std::move(_demand_generator_func)),
+      if_output_datalog(path_to_datalog_file != "")
 {
     // Initialize the fleet.
     const auto &fleet_config = platform_config_.mod_system_config.fleet_config;
@@ -23,14 +25,20 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(
     vehicles_ = std::vector<Vehicle>(fleet_config.fleet_size, vehicle);
 
     // Open the output datalog file.
-    fout_datalog.open("./datalog/datalog.yml"); 
+    if (if_output_datalog)
+    {
+        fout_datalog.open("./datalog/datalog.yml");
+    }
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
 Platform<RouterFunc, DemandGeneratorFunc>::~Platform()
 {
-    // Initialize the fleet.
-    fout_datalog.close();
+    // Close the datalog stream.
+    if (if_output_datalog)
+    {
+        fout_datalog.close();
+    }
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -52,7 +60,10 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation()
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
 {
-    write_to_datalog();
+    if (if_output_datalog)
+    {
+        write_to_datalog();
+    }
 
     // System time moves forward by a cycle.
     system_time_s_ += platform_config_.simulation_config.cycle_s;
