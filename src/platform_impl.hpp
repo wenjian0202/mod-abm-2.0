@@ -73,6 +73,12 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
     dispatch();
 }
 
+// template <typename RouterFunc, typename DemandGeneratorFunc>
+// void Platform<RouterFunc, DemandGeneratorFunc>::create_image()
+// {
+//     create_image();
+// }
+
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::dispatch()
 {

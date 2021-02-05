@@ -18,6 +18,6 @@ mod_system_config:
     max_pickup_wait_time_s: 600
 simulation_config:
   cycle_s: 60.0
-  simulation_duration_s: 180
-  warmup_duration_s: 60
-  winddown_duration_s: 60
+  simulation_duration_s: 120
+  warmup_duration_s: 0
+  winddown_duration_s: 0

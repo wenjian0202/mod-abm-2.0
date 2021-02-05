@@ -25,7 +25,7 @@ find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono d
 
 # The libraries
 add_library(mod-abm src/config.cpp src/demand_generator.cpp src/router.cpp src/types.cpp)
-target_link_libraries(mod-abm yaml-cpp fmt::fmt)
+target_link_libraries(mod-abm yaml-cpp fmt::fmt ${Python2_INCLUDE_DIRS})
 target_compile_features(mod-abm PRIVATE cxx_std_17)
 
 # The executable
@@ -86,7 +86,6 @@ if(NOT benchmark_POPULATED)
   add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR} EXCLUDE_FROM_ALL)
   set(BENCHMARK_INCLUDE_DIR ${benchmark_SOURCE_DIR}/include)
 endif()
-
 
 ########################################################################
 # Tests
