@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from PIL import Image
 from six import BytesIO
@@ -84,7 +83,7 @@ def fetch_tile(x, y, z):
 
 
 def main():
-    # print command line arguments
+    # Check command line arguments.
     if (len(sys.argv) != 3):
         print("[ERROR] We need exact 2 arguments aside from the program name for correct execution! \n"
               "- Usage: python3 <prog name> <arg1> <arg2>. \n"
