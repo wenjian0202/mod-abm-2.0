@@ -58,6 +58,9 @@ def main():
 
     print("Loaded boundary: lon_min={}, lon_max={}, lat_min={}, lat_max={}.".format(lon_min, lon_max, lat_min, lat_max))
 
+    img = Image.open(sys.argv[2])
+    w, h = img.size
+
     with open('datalog/datalog.yml') as file:
         datalog = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -67,12 +70,20 @@ def main():
         lons = []
         lats = []
         for step in waypoints[0]:
-            lons.append((step["lon"] - lon_min)/(lon_max - lon_min))
-            lats.append((step["lat"] - lat_min)/(lat_max - lat_min))
+            lons.append((step["lon"] - lon_min) / (lon_max - lon_min) * w)
+            lats.append((lat_max - step["lat"]) / (lat_max - lat_min) * h)
 
-        plt.plot(lons, lats)
-        plt.imread(sys.argv[2])
+        fig, ax = plt.subplots()
+        ax.imshow(img)
 
+        ax.plot(lons, lats)
+
+        # ax.spines['top'].set_visible(False)
+        # ax.spines['left'].set_visible(False)
+        # ax.spines['bottom'].set_visible(False)
+        # ax.spines['right'].set_visible(False)
+        # ax.set_xticks([])
+        # ax.set_yticks([])
         plt.show()
 
 if __name__ == "__main__":
