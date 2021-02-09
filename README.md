@@ -1,16 +1,16 @@
 # `mod-abm-2.0`
-An agent-based modeling platform for mobility-on-demand simulations. **WORK IN PROGRESS**.
+Modern agent-based modeling platform for mobility-on-demand simulations. **WORK IN PROGRESS**.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="400">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="800">
 
 ## What's `mod-abm-2.0`?
 
-`mod-abm-2.0` is the 2.0 version of our **a**gent-**b**ased **m**odeling platform designed to simulte the operations of **m**obility-**o**n-**d**emand systems. The software largely extends and rewrites the original [`amod-abm`](https://github.com/wenjian0202/amod-abm/), which was first developed in 2016 as part of an MIT research project. A lot of new designs have been made in this 2.0 version in pursuit of better scalability and extensibility, including:
+`mod-abm-2.0` is the 2.0 version of our **A**gent-**B**ased **M**odeling platform designed to simulte the operations of **M**obility-**o**n-**D**emand systems. The software largely extends and rewrites the original [`amod-abm`](https://github.com/wenjian0202/amod-abm/), which was first developed in 2016 as part of an MIT research project. A lot of new designs have been made in this 2.0 version in pursuit of better scalability and extensibility, including:
 - C++ with native [OSRM](https://github.com/Project-OSRM/osrm-backend) instead of Python to allow for much optimized runtime performance;
 - customization through user-defined system configuration and swappable modules for demand/dispatching to support different use cases and research interests;
 - thorough tests, good documentation and modern software development practices.
 
-`mod-abm-2.0` is able to simulate mobility-on-demand systems with *agents* (travelers, vehicles, couriers etc.) at the individual level. It provides infrastructure and tools to
+`mod-abm-2.0` is able to simulate mobility-on-demand systems with *agents* (travelers, vehicles, couriers etc.) at the individual level. It provides infrastructure and tools to:
 - support design and operational decisions (such as fleet size, pricing policies) for MoD systems, shared or non-shared, autonomous or non-autonomous;
 - model traveler behavior and traffic demand;
 - research smart dispatch algorithms w.r.t trip-vehicle assignment, fleet management, and rebalancing, including machine-learning models.
