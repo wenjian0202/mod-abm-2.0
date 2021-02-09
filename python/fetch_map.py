@@ -9,7 +9,7 @@ import yaml
 
 
 # Constants.
-MAX_TILES = 64
+MAX_TILES = 128
 TILE_SIZE = 256
 TILE_SERVER = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 

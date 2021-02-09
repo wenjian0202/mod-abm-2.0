@@ -17,8 +17,8 @@ struct AreaConfig
 /// \brief Config that describes the fleet.
 struct FleetConfig
 {
-    size_t fleet_size = 10;  // fleet size
-    size_t veh_capacity = 2; // vehicle capacity, 1 = non-shared, >2 is shared
+    size_t fleet_size = 10;   // fleet size
+    size_t veh_capacity = 2;  // vehicle capacity, 1 = non-shared, >2 is shared
     double initial_lon = 0.0; // max longitude accepted
     double initial_lat = 0.0; // min longitude accepted
 };
@@ -27,7 +27,7 @@ struct FleetConfig
 struct RequestConfig
 {
     double max_dispatch_wait_time_s = 60; // the max wait time allowed before a dispatching decision is made.
-    double max_pickup_wait_time_s = 600; // the max wait time allowed before a traveler is picked up.
+    double max_pickup_wait_time_s = 600;  // the max wait time allowed before a traveler is picked up.
 };
 
 /// \brief Config that describes the target MoD system.
@@ -46,12 +46,36 @@ struct SimulationConfig
     double winddown_duration_s = 1800;   // the period after the main sim for system to close trips
 };
 
+/// \brief Config for the output datalog.
+struct DatalogConfig
+{
+    bool output_datalog = false;             // true if we output datalog
+    std::string path_to_output_datalog = ""; // the path to the output datalog, empty if no output
+};
+
+/// \brief Config for video rendering.
+struct VideoConfig
+{
+    bool render_video = false;             // true if we render video
+    std::string path_to_output_video = ""; // the path to the output video, empty if no rendering
+    size_t frames_per_cycle = 10;          // the number of frames in each cycle
+    double replay_speed = 60;              // the speed of the video replay as compared to the actual system time
+};
+
+/// \brief Config that describes the output modes for datalog and video.
+struct OutputConfig
+{
+    DatalogConfig datalog_config;
+    VideoConfig video_config;
+};
+
 /// \brief The set of config parameters for the simulation platform.
 struct PlatformConfig
 {
     AreaConfig area_config;
     MoDSystemConfig mod_system_config;
     SimulationConfig simulation_config;
+    OutputConfig output_config;
 };
 
 /// \brief Load yaml platform config and convert into the c++ data struct.

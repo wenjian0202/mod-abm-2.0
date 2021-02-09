@@ -21,3 +21,12 @@ simulation_config:
   simulation_duration_s: 120
   warmup_duration_s: 0
   winddown_duration_s: 0
+output_config:
+  datalog_config:
+    output_datalog: true
+    path_to_output_datalog: "./datalog/datalog.yml"
+  video_config:
+    render_video: true
+    path_to_output_video: "./media/demo.mp4"
+    frames_per_cycle: 10
+    replay_speed: 60.0

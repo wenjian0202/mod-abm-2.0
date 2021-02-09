@@ -16,20 +16,20 @@ class Platform
 public:
     /// \brief Constructor.
     explicit Platform(
-        PlatformConfig _platform_config, 
-        RouterFunc _router_func, 
-        DemandGeneratorFunc _demand_generator_func,
-        std::string path_to_datalog_file = "");
+        PlatformConfig _platform_config,
+        RouterFunc _router_func,
+        DemandGeneratorFunc _demand_generator_func);
 
     /// \brief Destructor.
     ~Platform();
 
-    /// \brief Delete the other constructors. Rule of five. 
-    Platform(const Platform& other) = delete;
-    Platform(Platform&& other) = delete;
-    Platform& operator=(const Platform& other) = delete;
-    Platform& operator=(Platform&& other) = delete;
+    /// \brief Delete the other constructors. Rule of five.
+    Platform(const Platform &other) = delete;
+    Platform(Platform &&other) = delete;
+    Platform &operator=(const Platform &other) = delete;
+    Platform &operator=(Platform &&other) = delete;
 
+    /// \brief Run simulation. The master function that manages the entire simulation process.
     void run_simulation();
 
     // void invoke_demand_generator()
@@ -41,10 +41,16 @@ public:
     // }
 
 private:
+    /// \brief Run simulation for one cycle of time.
     void run_cycle();
 
+    /// \brief Advance all vehicles for one frame.
+    void advance_vehicles(double time_s);
+
+    /// \brief Dispatch vehicles to serve trips. Called once a cycle.
     void dispatch();
 
+    /// \brief
     void write_to_datalog();
 
     /// \brief The set of config parameters for the simulation platform.

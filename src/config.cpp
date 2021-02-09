@@ -29,7 +29,27 @@ PlatformConfig load_platform_config(const std::string &path_to_platform_config)
     platform_config.simulation_config.warmup_duration_s = platform_config_yaml["simulation_config"]["warmup_duration_s"].as<double>();
     platform_config.simulation_config.winddown_duration_s = platform_config_yaml["simulation_config"]["winddown_duration_s"].as<double>();
 
+    platform_config.output_config.datalog_config.output_datalog = platform_config_yaml["output_config"]["datalog_config"]["output_datalog"].as<bool>();
+    platform_config.output_config.datalog_config.path_to_output_datalog = platform_config_yaml["output_config"]["datalog_config"]["path_to_output_datalog"].as<std::string>();
+    platform_config.output_config.video_config.render_video = platform_config_yaml["output_config"]["video_config"]["render_video"].as<bool>();
+    platform_config.output_config.video_config.path_to_output_video = platform_config_yaml["output_config"]["video_config"]["path_to_output_video"].as<std::string>();
+    platform_config.output_config.video_config.frames_per_cycle = platform_config_yaml["output_config"]["video_config"]["frames_per_cycle"].as<size_t>();
+    platform_config.output_config.video_config.replay_speed = platform_config_yaml["output_config"]["video_config"]["replay_speed"].as<double>();
+
     fmt::print("[INFO] Loaded the platform configuration yaml file from {}.\n", path_to_platform_config);
+
+    // Sanity check of the input config.
+    if (platform_config.output_config.datalog_config.output_datalog)
+    {
+        assert(platform_config.output_config.datalog_config.path_to_output_datalog != "" && "Config must have non-empty path_to_output_datalog if output_datalog is true!");
+    }
+    if (platform_config.output_config.video_config.render_video)
+    {
+        assert(platform_config.output_config.datalog_config.output_datalog && "Config must have output_datalog config on if render_video is true!");
+        assert(platform_config.output_config.video_config.path_to_output_video != "" && "Config must have non-empty path_to_output_video if render_video is true!");
+        assert(platform_config.output_config.video_config.frames_per_cycle > 0 && "Config must have positive frames_per_cycle if render_video is true!");
+        assert(platform_config.output_config.video_config.replay_speed > 0 && "Config must have positive frames_per_cycle if render_video is true!");
+    }
 
     return platform_config;
 }
