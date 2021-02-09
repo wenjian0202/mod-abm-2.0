@@ -21,7 +21,6 @@ PlatformConfig load_platform_config(const std::string &path_to_platform_config)
     platform_config.mod_system_config.fleet_config.initial_lon = platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lon"].as<double>();
     platform_config.mod_system_config.fleet_config.initial_lat = platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lat"].as<double>();
 
-    platform_config.mod_system_config.request_config.max_dispatch_wait_time_s = platform_config_yaml["mod_system_config"]["request_config"]["max_dispatch_wait_time_s"].as<double>();
     platform_config.mod_system_config.request_config.max_pickup_wait_time_s = platform_config_yaml["mod_system_config"]["request_config"]["max_pickup_wait_time_s"].as<double>();
 
     platform_config.simulation_config.cycle_s = platform_config_yaml["simulation_config"]["cycle_s"].as<double>();

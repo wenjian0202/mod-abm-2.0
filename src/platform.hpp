@@ -7,7 +7,6 @@
 #include "types.hpp"
 
 #include <fstream>
-#include <queue>
 
 /// \brief The agent-based modeling platform that simulates the mobility-on-demand systems.
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -47,8 +46,8 @@ private:
     /// \brief Advance all vehicles for one frame.
     void advance_vehicles(double time_s);
 
-    /// \brief Dispatch vehicles to serve trips. Called once a cycle.
-    void dispatch();
+    /// \brief Dispatch vehicles to serve pending trips. Called once a cycle.
+    void dispatch(const std::vector<size_t> &pending_trip_ids);
 
     /// \brief
     void write_to_datalog();
@@ -70,9 +69,6 @@ private:
 
     /// \brief The vector of trips created during the entire simulation process.
     std::vector<Vehicle> vehicles_ = {};
-
-    /// \brief The queue of iterators pointing to trips to be dispatched.
-    std::queue<size_t> pending_trip_ids_ = {};
 
     /// \brief The boolean indicating if we output datalog.
     bool if_output_datalog = false;

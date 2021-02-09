@@ -11,7 +11,7 @@
 
 template <typename RouterFunc>
 void assign_trips_through_insertion_heuristics(
-    std::queue<size_t> &pending_trip_ids,
+    const std::vector<size_t> &pending_trip_ids,
     std::vector<Trip> &trips,
     std::vector<Vehicle> &vehicles,
     double system_time_s,
@@ -19,36 +19,19 @@ void assign_trips_through_insertion_heuristics(
 {
     fmt::print("[DEBUG] Assigning trips to vehicles through insertion heuristics.\n");
 
-    auto num_pending_trips = pending_trip_ids.size();
-
     // For each trip, we assign it to the best vehicle.
-    for (auto i = 0; i < num_pending_trips; i++)
+    for (auto trip_id : pending_trip_ids)
     {
-        auto trip_id = pending_trip_ids.front();
-        pending_trip_ids.pop();
         auto &trip = trips[trip_id];
 
-        auto success = assign_trip_through_insertion_heuristics(trip, trips, vehicles, system_time_s, router_func);
-
-        if (!success)
-        {
-            // If we haven't reached the max dispatch time, push it back to the queue for future retries.
-            if (trip.max_dispatch_time_s > system_time_s)
-            {
-                pending_trip_ids.push(trip_id);
-            }
-            else
-            {
-                fmt::print("[DEBUG] Trip #{} walked away.\n", trip.id);
-            }
-        }
+        assign_trip_through_insertion_heuristics(trip, trips, vehicles, system_time_s, router_func);
     }
 
     return;
 }
 
 template <typename RouterFunc>
-bool assign_trip_through_insertion_heuristics(
+void assign_trip_through_insertion_heuristics(
     Trip &trip,
     const std::vector<Trip> &trips,
     std::vector<Vehicle> &vehicles,
@@ -77,7 +60,7 @@ bool assign_trip_through_insertion_heuristics(
     {
         fmt::print("[DEBUG] Failed to assign Trip #{}.\n", trip.id);
 
-        return false;
+        return;
     }
 
     // Insert the trip to the best vehicle.
@@ -87,7 +70,7 @@ bool assign_trip_through_insertion_heuristics(
     fmt::print("[DEBUG] Assigned Trip #{} to Vehicle #{}, which has {} waypoints.\n",
                trip.id, best_vehicle_index, best_vehicle.waypoints.size());
 
-    return true;
+    return;
 }
 
 double get_cost_of_waypoints(const std::vector<Waypoint> &waypoints)

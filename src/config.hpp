@@ -26,8 +26,7 @@ struct FleetConfig
 /// \brief Config that describes the requests.
 struct RequestConfig
 {
-    double max_dispatch_wait_time_s = 60; // the max wait time allowed before a dispatching decision is made.
-    double max_pickup_wait_time_s = 600;  // the max wait time allowed before a traveler is picked up.
+    double max_pickup_wait_time_s = 600; // the max wait time allowed before a traveler is picked up.
 };
 
 /// \brief Config that describes the target MoD system.

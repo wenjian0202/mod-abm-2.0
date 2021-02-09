@@ -5,17 +5,15 @@
 
 #include "types.hpp"
 
-#include <queue>
-
 /// \brief Assign the pending trips to the vehicles using Insertion Heuristics.
-/// \param pending_trip_ids A queue holding indices to the pending trips.
+/// \param pending_trip_ids A vector holding indices to the pending trips.
 /// \param trips A vector of all trips.
 /// \param vehicles A vector of vehicles.
 /// \param system_time_s The system time.
 /// \tparam router_func The router func that finds path between two poses.
 template <typename RouterFunc>
 void assign_trips_through_insertion_heuristics(
-    std::queue<size_t> &pending_trip_ids,
+    const std::vector<size_t> &pending_trip_ids,
     std::vector<Trip> &trips,
     std::vector<Vehicle> &vehicles,
     double system_time_s,
@@ -28,7 +26,7 @@ void assign_trips_through_insertion_heuristics(
 /// \param system_time_s The system time.
 /// \tparam router_func The router func that finds path between two poses.
 template <typename RouterFunc>
-bool assign_trip_through_insertion_heuristics(
+void assign_trip_through_insertion_heuristics(
     Trip &trip,
     const std::vector<Trip> &trips,
     std::vector<Vehicle> &vehicles,

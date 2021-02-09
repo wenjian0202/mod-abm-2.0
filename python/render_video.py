@@ -44,17 +44,30 @@ def convert_to_x_and_y(pos, lon_min, lon_max, lat_min, lat_max, w, h):
 
 
 def get_color(id):
+    color = "0.50"
     if id == 0:
-        return 'crimson'
-    if id == 1:
-        return 'darkorange'
-    if id == 2:
-        return 'gold'
-    if id == 1:
-        return 'darkgreen'
-    if id == 1:
-        return 'royalblue'
-    return 'grey'
+        color = "#dc241f"
+    elif id == 1:
+        color = "#9b0058"
+    elif id == 2:
+        color = "#0019a8"
+    elif id == 3:
+        color = "#0098d8"
+    elif id == 4:
+        color = "#b26300"
+    return color
+
+    # if id == 0:
+    #     return 'crimson'
+    # if id == 1:
+    #     return 'darkorange'
+    # if id == 2:
+    #     return 'gold'
+    # if id == 1:
+    #     return 'darkgreen'
+    # if id == 1:
+    #     return 'royalblue'
+    # return 'grey'
 
 
 def main():
@@ -122,13 +135,13 @@ def main():
             # Get the color of the current vehicle. We only color the first 5 vehicles for visibility.
             color = get_color(id)
             vehs.append(ax.plot([], [], color=color,
-                                marker='o', markersize=5, alpha=0.7)[0])
+                                marker='o', markersize=5, alpha=0.8)[0])
             wp0.append(ax.plot([], [], linestyle='-',
-                               color=color, alpha=0.7)[0])
+                               color=color, alpha=0.8)[0])
             wp1.append(ax.plot([], [], linestyle='--',
-                               color=color, alpha=0.7)[0])
+                               color=color, alpha=0.8)[0])
             wp2.append(ax.plot([], [], linestyle=':',
-                               color=color, alpha=0.4)[0])
+                               color=color, alpha=0.5)[0])
 
         def animate(n):
             vehicles = datalog[n]["vehicles"]
@@ -163,15 +176,18 @@ def main():
         anime = animation.FuncAnimation(fig, animate, frames=num_frames)
 
         # Set up formatting for the movie file and write.
-        frame_interval_s = config["simulation_config"]["cycle_s"] / config["output_config"]["video_config"]["frames_per_cycle"]
-        fps = 1 / frame_interval_s * config["output_config"]["video_config"]["replay_speed"]
+        frame_interval_s = config["simulation_config"]["cycle_s"] / \
+            config["output_config"]["video_config"]["frames_per_cycle"]
+        fps = 1 / frame_interval_s * \
+            config["output_config"]["video_config"]["replay_speed"]
         path_to_output_video = config["output_config"]["video_config"]["path_to_output_video"]
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=fps, metadata=dict(
             artist='mod-abm-2.0'), bitrate=1800)
         anime.save(path_to_output_video, writer=writer)
 
-        print("Video saved at {} using fps={}.".format(path_to_output_video, fps))
+        print("Video saved at {}. FPS={}, DPI={}.".format(
+            path_to_output_video, fps, DPI))
 
 
 if __name__ == "__main__":

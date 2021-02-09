@@ -74,6 +74,11 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
             advance_vehicles(frame_time_s);
             write_to_datalog();
         }
+
+        fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s), creating {} frames.\n",
+                   system_time_s_,
+                   platform_config_.simulation_config.cycle_s,
+                   platform_config_.output_config.video_config.frames_per_cycle);
     }
     // Otherwise, we advance by the whole cycle.
     else
@@ -84,19 +89,22 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
         {
             write_to_datalog();
         }
+
+        fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s).\n", system_time_s_, platform_config_.simulation_config.cycle_s);
     }
 
     // Get trip requests generated during the past cycle.
     auto requests = demand_generator_func_(system_time_s_);
 
-    // Add the requests into the trip list as well as the pending trip queue.
+    // Add the requests into the trip list as well as the pending trips.
+    std::vector<size_t> pending_trip_ids;
     for (auto &request : requests)
     {
         assert(request.origin.lon >= platform_config_.area_config.lon_min && request.origin.lon <= platform_config_.area_config.lon_max && "request.origin.lon is out of bound!");
         assert(request.origin.lat >= platform_config_.area_config.lat_min && request.origin.lat <= platform_config_.area_config.lat_max && "request.origin.lat is out of bound!");
         assert(request.destination.lon >= platform_config_.area_config.lon_min && request.destination.lon <= platform_config_.area_config.lon_max && "request.destination.lon is out of bound!");
         assert(request.destination.lat >= platform_config_.area_config.lat_min && request.destination.lat <= platform_config_.area_config.lat_max && "request.destination.lat is out of bound!");
-        
+
         Trip trip;
 
         trip.id = trips_.size();
@@ -104,15 +112,14 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
         trip.destination = request.destination;
         trip.status = TripStatus::REQUESTED;
         trip.request_time_s = request.request_time_s;
-        trip.max_dispatch_time_s = request.request_time_s + platform_config_.mod_system_config.request_config.max_dispatch_wait_time_s;
         trip.max_pickup_time_s = request.request_time_s + platform_config_.mod_system_config.request_config.max_pickup_wait_time_s;
 
-        pending_trip_ids_.push(trips_.size());
+        pending_trip_ids.emplace_back(trips_.size());
         trips_.emplace_back(std::move(trip));
     }
 
     // Dispatch
-    dispatch();
+    dispatch(pending_trip_ids);
 }
 
 namespace
@@ -302,8 +309,6 @@ namespace
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles(double time_s)
 {
-    fmt::print("[DEBUG] T = {}: Advance vehicles by {} second(s).\n", system_time_s_, time_s);
-
     // Do it for each of the vehicles independently.
     for (auto &vehicle : vehicles_)
     {
@@ -316,14 +321,14 @@ void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles(double time_s)
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::dispatch()
+void Platform<RouterFunc, DemandGeneratorFunc>::dispatch(const std::vector<size_t> &pending_trip_ids)
 {
     fmt::print("[DEBUG] T = {}: Dispatching {} pending trip(s) to vehicles.\n",
                system_time_s_,
-               pending_trip_ids_.size());
+               pending_trip_ids.size());
 
     // Assign pending trips to vehicles.
-    assign_trips_through_insertion_heuristics(pending_trip_ids_, trips_, vehicles_, system_time_s_, router_func_);
+    assign_trips_through_insertion_heuristics(pending_trip_ids, trips_, vehicles_, system_time_s_, router_func_);
 
     // Reoptimize the assignments for better level of service.
     // (TODO)
@@ -353,15 +358,16 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
         for (const auto &waypoint : vehicle.waypoints)
         {
             YAML::Node waypoint_node;
+            auto count = 0;
             for (const auto &leg : waypoint.route.legs)
             {
                 for (const auto &step : leg.steps)
                 {
-                    for (const auto &pos : step.poses)
+                    for (const auto &pose : step.poses)
                     {
                         YAML::Node leg_node;
-                        leg_node["lon"] = pos.lon;
-                        leg_node["lat"] = pos.lat;
+                        leg_node["lon"] = pose.lon;
+                        leg_node["lat"] = pose.lat;
                         waypoint_node.push_back(std::move(leg_node));
                     }
                 }

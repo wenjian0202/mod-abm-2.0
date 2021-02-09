@@ -111,7 +111,6 @@ struct Trip
     Pos destination;
     TripStatus status = TripStatus::UNDEFINED;
     double request_time_s = 0.0;
-    double max_dispatch_time_s = 0.0;
     double max_pickup_time_s = 0.0;
     double pickup_time_s = 0.0;
     double dropoff_time_s = 0.0;
