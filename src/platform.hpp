@@ -5,6 +5,7 @@
 
 #include "config.hpp"
 #include "types.hpp"
+#include "vehicle.hpp"
 
 #include <fstream>
 
