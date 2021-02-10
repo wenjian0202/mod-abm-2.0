@@ -5,13 +5,25 @@
 
 #include <gtest/gtest.h>
 
-TEST(Pos, initialize_instance)
+TEST(RoutingResponse, default_initialization)
 {
-    auto lon = 113.93593149478123;
-    auto lat = 22.312648328005512;
+    RoutingResponse response;
 
-    Pos pos{lon, lat};
+    EXPECT_EQ(response.status, RoutingStatus::UNDEFINED);
+}
 
-    EXPECT_DOUBLE_EQ(pos.lon, lon);
-    EXPECT_DOUBLE_EQ(pos.lat, lat);
+TEST(Trip, default_initialization)
+{
+    Trip trip;
+
+    EXPECT_EQ(trip.status, TripStatus::UNDEFINED);
+}
+
+TEST(Vehicle, default_initialization)
+{
+    Vehicle vehicle;
+
+    EXPECT_EQ(vehicle.capacity, 1);
+    EXPECT_EQ(vehicle.load, 0);
+    EXPECT_TRUE(vehicle.waypoints.empty());
 }

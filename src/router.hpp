@@ -24,3 +24,6 @@ private:
     /// \brief The unique pointer to the osrm routing engine instance.
     std::unique_ptr<osrm::OSRM> osrm_ptr_;
 };
+
+/// \brief Convert the json route data into the c++ data struct.
+Route convert_json_to_route(osrm::json::Object route_json);

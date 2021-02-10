@@ -45,9 +45,6 @@ struct Route
     std::vector<Leg> legs;
 };
 
-/// \brief Convert the json route data into the c++ data struct.
-Route convert_json_to_route(osrm::json::Object route_json);
-
 /// \brief The status of the routing response.
 enum class RoutingStatus
 {

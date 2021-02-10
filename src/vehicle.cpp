@@ -54,8 +54,8 @@ void truncate_step_by_time(Step &step, double time_s)
         accumulated_dist += dist;
     }
 
-    step.distance_m *= ratio;
-    step.duration_s *= ratio;
+    step.distance_m *= (1 - ratio);
+    step.duration_s *= (1 - ratio);
 
     assert(step.poses.size() >= 2 && "Output step in truncate_step_by_time() must have at least 2 poses!");
     assert(step.distance_m > 0 && "Output step's distance in truncate_step_by_time() must be positive!");
@@ -71,20 +71,26 @@ void truncate_leg_by_time(Leg &leg, double time_s)
     assert(time_s >= 0 && "Time in truncate_leg_by_time() must be non negative!");
     assert(time_s < leg.duration_s && "Time in truncate_leg_by_time() must be less than leg's duration!");
 
-    while (!leg.steps.empty())
+    // Early return.
+    if (time_s == 0.0)
     {
-        auto &step = leg.steps.front();
+        return;
+    }
+
+    for (auto i = 0; i < leg.steps.size(); i++)
+    {
+        auto &step = leg.steps[i];
 
         // If we can finish this step within the time, remove the entire step.
         if (step.duration_s <= time_s)
         {
             time_s -= step.duration_s;
-            leg.steps.erase(leg.steps.begin());
-
             continue;
         }
 
         truncate_step_by_time(step, time_s);
+        leg.steps.erase(leg.steps.begin(), leg.steps.begin() + i);
+
         break;
     }
 
@@ -111,23 +117,26 @@ void truncate_route_by_time(Route &route, double time_s)
     assert(time_s >= 0 && "Time in truncate_route_by_time() must be non negative!");
     assert(time_s < route.duration_s && "Time in truncate_route_by_time() must be less than route's duration!");
 
-    while (!route.legs.empty())
+    // Early return.
+    if (time_s == 0.0)
     {
-        auto &leg = route.legs.front();
+        return;
+    }
 
-        // If we can finish this leg within the time, remove the entire leg.
+    for (auto i = 0; i < route.legs.size(); i++)
+    {
+        auto &leg = route.legs[i];
+
+        // If we can finish this step within the time, remove the entire step.
         if (leg.duration_s <= time_s)
         {
             time_s -= leg.duration_s;
-
-            route.distance_m -= leg.distance_m;
-            route.duration_s -= leg.duration_s;
-
-            route.legs.erase(route.legs.begin());
             continue;
         }
 
         truncate_leg_by_time(leg, time_s);
+        route.legs.erase(route.legs.begin(), route.legs.begin() + i);
+
         break;
     }
 
@@ -147,9 +156,15 @@ void truncate_route_by_time(Route &route, double time_s)
 
 void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_time_s, double time_s)
 {
-    while (!vehicle.waypoints.empty())
+    // Early return.
+    if (time_s == 0.0)
     {
-        auto &wp = vehicle.waypoints.front();
+        return;
+    }
+
+    for (auto i = 0; i < vehicle.waypoints.size(); i++)
+    {
+        auto &wp = vehicle.waypoints[i];
 
         // If we can finish this waypoint within the time.
         if (wp.route.duration_s <= time_s)
@@ -170,7 +185,6 @@ void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_t
                 vehicle.load--;
             }
 
-            vehicle.waypoints.erase(vehicle.waypoints.begin());
             continue;
         }
 
@@ -178,8 +192,12 @@ void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_t
         truncate_route_by_time(wp.route, time_s);
         vehicle.pos = wp.route.legs.front().steps.front().poses.front();
 
+        vehicle.waypoints.erase(vehicle.waypoints.begin(), vehicle.waypoints.begin() + i);
+
         return;
     }
 
+    // We've finished all waypoints.
+    vehicle.waypoints.clear();
     return;
 }

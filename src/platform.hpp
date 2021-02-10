@@ -9,7 +9,7 @@
 
 #include <fstream>
 
-/// \brief The agent-based modeling platform that simulates the mobility-on-demand systems.
+/// \brief The agent-based modeling platform that simulates the mobility-on-demand system.
 template <typename RouterFunc, typename DemandGeneratorFunc>
 class Platform
 {
@@ -32,25 +32,17 @@ public:
     /// \brief Run simulation. The master function that manages the entire simulation process.
     void run_simulation();
 
-    // void invoke_demand_generator()
-    // {
-    //     // Pos origin{113.93593149478123, 22.312648328005512};
-    //     // Pos destination{114.13602296340699, 22.28328541732128};
-
-    //     // auto ret = router_func_(origin, destination);
-    // }
-
 private:
-    /// \brief Run simulation for one cycle of time.
+    /// \brief Run simulation for one cycle. Invoked repetetively by run_simulation().
     void run_cycle();
 
-    /// \brief Advance all vehicles for one frame.
+    /// \brief Advance all vehicles for given time and move forward the system time. Invoked by run_cycle().
     void advance_vehicles(double time_s);
 
-    /// \brief Dispatch vehicles to serve pending trips. Called once a cycle.
+    /// \brief Dispatch vehicles to serve pending trips. Invoked at the end of the cycle by run_cycle().
     void dispatch(const std::vector<size_t> &pending_trip_ids);
 
-    /// \brief
+    /// \brief Write the data of the current system state to datalog.
     void write_to_datalog();
 
     /// \brief The set of config parameters for the simulation platform.
@@ -70,9 +62,6 @@ private:
 
     /// \brief The vector of trips created during the entire simulation process.
     std::vector<Vehicle> vehicles_ = {};
-
-    /// \brief The boolean indicating if we output datalog.
-    bool if_output_datalog = false;
 
     /// \brief The ofstream that outputs to the datalog.
     std::ofstream fout_datalog;

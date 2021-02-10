@@ -23,11 +23,12 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(
     vehicles_ = std::vector<Vehicle>(fleet_config.fleet_size, vehicle);
 
     // Open the output datalog file.
-    if (platform_config_.output_config.datalog_config.output_datalog)
+    const auto &datalog_config = platform_config_.output_config.datalog_config;
+    if (datalog_config.output_datalog)
     {
-        fout_datalog.open(platform_config_.output_config.datalog_config.path_to_output_datalog);
+        fout_datalog.open(datalog_config.path_to_output_datalog);
 
-        fmt::print("[INFO] Open the output datalog file at {}.\n", platform_config_.output_config.datalog_config.path_to_output_datalog);
+        fmt::print("[INFO] Open the output datalog file at {}.\n", datalog_config.path_to_output_datalog);
     }
 }
 
@@ -35,7 +36,7 @@ template <typename RouterFunc, typename DemandGeneratorFunc>
 Platform<RouterFunc, DemandGeneratorFunc>::~Platform()
 {
     // Close the datalog stream.
-    if (platform_config_.output_config.datalog_config.output_datalog)
+    if (fout_datalog.is_open())
     {
         fout_datalog.close();
     }
@@ -45,10 +46,14 @@ template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation()
 {
     // Total simulation time as the sum of warm-up, main simulation, and wind-down.
-    auto total_simulation_time_s = platform_config_.simulation_config.warmup_duration_s + platform_config_.simulation_config.simulation_duration_s + platform_config_.simulation_config.winddown_duration_s;
+    auto total_simulation_time_s =
+        platform_config_.simulation_config.warmup_duration_s +
+        platform_config_.simulation_config.simulation_duration_s +
+        platform_config_.simulation_config.winddown_duration_s;
 
     fmt::print("[INFO] Simulation started. Running for total {} seconds.\n", total_simulation_time_s);
 
+    // Run simulation cycle by cycle.
     while (system_time_s_ < total_simulation_time_s)
     {
         run_cycle();
@@ -64,7 +69,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
                system_time_s_,
                static_cast<int>(system_time_s_ / platform_config_.simulation_config.cycle_s));
 
-    // If we render video, we compute vehicles' location for each frame and write to datalog.
+    // If we render video, we compute the states of all vehicles for each of the frames in this cycle and write to datalog.
     if (platform_config_.output_config.video_config.render_video)
     {
         const auto frame_time_s = platform_config_.simulation_config.cycle_s / platform_config_.output_config.video_config.frames_per_cycle;
@@ -80,7 +85,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
                    platform_config_.simulation_config.cycle_s,
                    platform_config_.output_config.video_config.frames_per_cycle);
     }
-    // Otherwise, we advance by the whole cycle.
+    // Otherwise, we advance the vehicles by the whole cycle time.
     else
     {
         advance_vehicles(platform_config_.simulation_config.cycle_s);
@@ -100,10 +105,18 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
     std::vector<size_t> pending_trip_ids;
     for (auto &request : requests)
     {
-        assert(request.origin.lon >= platform_config_.area_config.lon_min && request.origin.lon <= platform_config_.area_config.lon_max && "request.origin.lon is out of bound!");
-        assert(request.origin.lat >= platform_config_.area_config.lat_min && request.origin.lat <= platform_config_.area_config.lat_max && "request.origin.lat is out of bound!");
-        assert(request.destination.lon >= platform_config_.area_config.lon_min && request.destination.lon <= platform_config_.area_config.lon_max && "request.destination.lon is out of bound!");
-        assert(request.destination.lat >= platform_config_.area_config.lat_min && request.destination.lat <= platform_config_.area_config.lat_max && "request.destination.lat is out of bound!");
+        assert(request.origin.lon >= platform_config_.area_config.lon_min &&
+               request.origin.lon <= platform_config_.area_config.lon_max &&
+               "request.origin.lon is out of bound!");
+        assert(request.origin.lat >= platform_config_.area_config.lat_min &&
+               request.origin.lat <= platform_config_.area_config.lat_max &&
+               "request.origin.lat is out of bound!");
+        assert(request.destination.lon >= platform_config_.area_config.lon_min &&
+               request.destination.lon <= platform_config_.area_config.lon_max &&
+               "request.destination.lon is out of bound!");
+        assert(request.destination.lat >= platform_config_.area_config.lat_min &&
+               request.destination.lat <= platform_config_.area_config.lat_max &&
+               "request.destination.lat is out of bound!");
 
         Trip trip;
 
@@ -118,8 +131,10 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
         trips_.emplace_back(std::move(trip));
     }
 
-    // Dispatch
+    // Dispatch the pending trips.
     dispatch(pending_trip_ids);
+
+    return;
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -131,6 +146,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles(double time_s)
         advance_vehicle(vehicle, trips_, system_time_s_, time_s);
     }
 
+    // Increment the system time.
     system_time_s_ += time_s;
 
     return;
@@ -161,6 +177,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
     YAML::Node node;
     node["system_time_s"] = system_time_s_;
 
+    // For each of the vehicles, we write the relavant data in yaml format.
     for (const auto &vehicle : vehicles_)
     {
         YAML::Node veh_node;

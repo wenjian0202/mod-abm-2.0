@@ -11,19 +11,19 @@
 
 Router::Router(std::string _path_to_osrm_data)
 {
-    // Set up the OSRM backend routing engine
+    // Set up the OSRM backend routing engine.
     osrm::EngineConfig config;
 
-    // Path to the base osrm map data
+    // Path to the base osrm map data.
     config.storage_config = {std::move(_path_to_osrm_data)};
 
-    // No shared memory
+    // No shared memory.
     config.use_shared_memory = false;
 
     // Use Multi-Level Dijkstra (MLD) for routing. This requires extract+partition+customize pre-processing.
     config.algorithm = osrm::EngineConfig::Algorithm::MLD;
 
-    // Create the routing engine instance
+    // Create the routing engine instance.
     osrm_ptr_ = std::make_unique<osrm::OSRM>(config);
 
     fmt::print("[INFO] Initiated the OSRM routing engine using map data from {}.\n", _path_to_osrm_data);
@@ -31,26 +31,26 @@ Router::Router(std::string _path_to_osrm_data)
 
 RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
 {
-    // Convert to the osrm route request params
+    // Convert to the osrm route request params.
     osrm::RouteParameters params;
 
-    // Origin -> Destination
+    // Origin -> Destination.
     params.coordinates.push_back({osrm::util::FloatLongitude{origin.lon}, osrm::util::FloatLatitude{origin.lat}});
     params.coordinates.push_back({osrm::util::FloatLongitude{destination.lon}, osrm::util::FloatLatitude{destination.lat}});
 
-    // Set up other params
+    // Set up other params.
     params.steps = true;                                                // returns the detailed steps of the route
     params.alternatives = false;                                        // no alternative routes, just find the best one
     params.geometries = osrm::RouteParameters::GeometriesType::GeoJSON; // route geometry encoded in GeoJSON
     params.overview = osrm::RouteParameters::OverviewType::False;       // no route overview
 
-    // Response is in JSON format
+    // Response is in JSON format.
     osrm::engine::api::ResultT result = osrm::json::Object();
 
-    // Execute routing request, which does the heavy lifting
+    // Execute routing request, which does the heavy lifting.
     const auto status = osrm_ptr_->Route(params, result);
 
-    // Parse the result
+    // Parse the result.
     auto &json_result = result.get<osrm::json::Object>();
     RoutingResponse response;
 
@@ -58,7 +58,7 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
     {
         auto &routes = json_result.values["routes"].get<osrm::json::Array>();
 
-        // Return empty response if empty route
+        // Return empty response if empty route.
         if (routes.values.empty())
         {
             response.status = RoutingStatus::EMPTY;
@@ -67,12 +67,12 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
             return response;
         }
 
-        // Let's just use the first route
+        // Let's just use the first route.
         auto &route = routes.values.at(0).get<osrm::json::Object>();
         const auto distance = route.values["distance"].get<osrm::json::Number>().value;
         const auto duration = route.values["duration"].get<osrm::json::Number>().value;
 
-        // Return empty response if extract does not contain the default coordinates from above
+        // Return empty response if extract does not contain the default coordinates from above.
         if (distance == 0 || duration == 0)
         {
             response.status = RoutingStatus::EMPTY;
@@ -94,4 +94,53 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination)
     response.message = fmt::format("Code: {}, Message {}", code, message);
 
     return response;
+}
+
+Route convert_json_to_route(osrm::json::Object route_json)
+{
+    Route route;
+
+    route.distance_m = route_json.values["distance"].get<osrm::json::Number>().value;
+    route.duration_s = route_json.values["duration"].get<osrm::json::Number>().value;
+
+    auto &legs_json = route_json.values["legs"].get<osrm::json::Array>();
+
+    for (auto &leg_json : legs_json.values)
+    {
+        auto &leg_json_obejct = leg_json.get<osrm::json::Object>();
+
+        Leg leg;
+        leg.distance_m = leg_json_obejct.values["distance"].get<osrm::json::Number>().value;
+        leg.duration_s = leg_json_obejct.values["duration"].get<osrm::json::Number>().value;
+
+        auto &steps_json = leg_json_obejct.values["steps"].get<osrm::json::Array>();
+
+        for (auto &step_json : steps_json.values)
+        {
+            auto &step_json_obejct = step_json.get<osrm::json::Object>();
+
+            Step step;
+            step.distance_m = step_json_obejct.values["distance"].get<osrm::json::Number>().value;
+            step.duration_s = step_json_obejct.values["duration"].get<osrm::json::Number>().value;
+
+            auto &poses_json = step_json_obejct.values["geometry"].get<osrm::json::Object>().values["coordinates"].get<osrm::json::Array>();
+
+            for (auto &pos_json : poses_json.values)
+            {
+                auto &pos_json_obejct = pos_json.get<osrm::json::Array>();
+
+                Pos pos;
+                pos.lon = pos_json_obejct.values[0].get<osrm::json::Number>().value;
+                pos.lat = pos_json_obejct.values[1].get<osrm::json::Number>().value;
+
+                step.poses.emplace_back(std::move(pos));
+            }
+
+            leg.steps.emplace_back(std::move(step));
+        }
+
+        route.legs.emplace_back(std::move(leg));
+    }
+
+    return route;
 }
