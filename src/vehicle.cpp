@@ -176,11 +176,15 @@ void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_t
 
             if (wp.op == WaypointOp::PICKUP)
             {
+                assert(vehicle.load < vehicle.capacity && "Vehicle's load should never exceed its capacity!");
+
                 trips[wp.trip_id].pickup_time_s = system_time_s;
                 vehicle.load++;
             }
             else if (wp.op == WaypointOp::DROPOFF)
             {
+                assert(vehicle.load > 0 && "Vehicle's load should not be zero before a dropoff!");
+
                 trips[wp.trip_id].dropoff_time_s = system_time_s;
                 vehicle.load--;
             }
