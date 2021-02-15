@@ -24,13 +24,13 @@ find_package(Boost 1.52.0 COMPONENTS filesystem system thread iostreams chrono d
 ########################################################################
 
 # The libraries
-add_library(mod-abm src/config.cpp src/demand_generator.cpp src/router.cpp src/vehicle.cpp )
-target_link_libraries(mod-abm yaml-cpp fmt::fmt ${Python2_INCLUDE_DIRS})
-target_compile_features(mod-abm PRIVATE cxx_std_17)
+add_library(mod-abm-lib src/config.cpp src/demand_generator.cpp src/router.cpp src/vehicle.cpp )
+target_link_libraries(mod-abm-lib yaml-cpp fmt::fmt ${Python2_INCLUDE_DIRS})
+target_compile_features(mod-abm-lib PRIVATE cxx_std_17)
 
 # The executable
 add_executable(main src/main.cpp)
-target_link_libraries(main mod-abm yaml-cpp fmt::fmt ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+target_link_libraries(main mod-abm-lib yaml-cpp fmt::fmt ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
 target_compile_features(main PRIVATE cxx_std_17)
 
 # More linking for LibOSRM
@@ -96,14 +96,14 @@ enable_testing()
 include(GoogleTest)
 
 # Add executable for all test cases
-add_executable(mod-abm_test test/types_test.cpp test/router_test.cpp test/vehicle_test.cpp)
-target_link_libraries(mod-abm_test gtest gmock gtest_main mod-abm ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
-gtest_discover_tests(mod-abm_test
+add_executable(run_all_tests test/types_test.cpp test/router_test.cpp test/vehicle_test.cpp)
+target_link_libraries(run_all_tests gtest gmock gtest_main mod-abm-lib ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+gtest_discover_tests(run_all_tests
         # set a working directory so your project root so that you can find test data via paths relative to the project root
         WORKING_DIRECTORY ${PROJECT_DIR}
         PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
     )
-set_target_properties(mod-abm_test PROPERTIES FOLDER tests)
+set_target_properties(run_all_tests PROPERTIES FOLDER tests)
 
 ########################################################################
 # Benchmarks
@@ -111,4 +111,4 @@ set_target_properties(mod-abm_test PROPERTIES FOLDER tests)
 
 # Benchmarks
 add_executable(router_benchmark benchmark/router_benchmark.cpp)
-target_link_libraries(router_benchmark benchmark::benchmark mod-abm ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})
+target_link_libraries(router_benchmark benchmark::benchmark mod-abm-lib ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES})

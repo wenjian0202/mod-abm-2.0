@@ -19,8 +19,10 @@ void truncate_route_by_time(Route &route, double time_s);
 /// \param trips the reference to the trips. Completing a waypoint might result in change of trip status.
 /// \param system_time_s the current system time in seconds.
 /// \param time_s the time in seconds that we need to advance the system.
+/// \param update_vehicle_stats true if we update the vehicle statistics including distance traveled.
 void advance_vehicle(
     Vehicle &vehicle,
     std::vector<Trip> &trips,
     double system_time_s,
-    double time_s);
+    double time_s,
+    bool update_vehicle_stats = true);

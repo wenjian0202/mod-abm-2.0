@@ -37,7 +37,11 @@ void assign_trip_through_insertion_heuristics(
 double get_cost_of_waypoints(const std::vector<Waypoint> &waypoints);
 
 /// \brief Validate waypoints by checking the allowed pickup time etc.
-bool validate_waypoints(const std::vector<Waypoint> &waypoints, const std::vector<Trip> &trips, double system_time_s);
+bool validate_waypoints(
+    const std::vector<Waypoint> &waypoints,
+    const std::vector<Trip> &trips,
+    const Vehicle &vehicle,
+    double system_time_s);
 
 /// \brief Compute the time that a trip is picked up knowing pickup index.
 /// \param trip The trip to be inserted.

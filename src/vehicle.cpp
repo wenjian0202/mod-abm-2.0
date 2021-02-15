@@ -154,7 +154,7 @@ void truncate_route_by_time(Route &route, double time_s)
     assert(route.duration_s > 0 && "Output route's duration in truncate_route_by_time() must be positive!");
 }
 
-void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_time_s, double time_s)
+void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_time_s, double time_s, bool update_vehicle_stats)
 {
     // Early return.
     if (time_s == 0.0)
@@ -174,27 +174,48 @@ void advance_vehicle(Vehicle &vehicle, std::vector<Trip> &trips, double system_t
 
             vehicle.pos = wp.pos;
 
+            if (update_vehicle_stats)
+            {
+                vehicle.dist_traveled_m += wp.route.distance_m;
+                vehicle.loaded_dist_traveled_m += wp.route.distance_m * vehicle.load;
+            }
+
             if (wp.op == WaypointOp::PICKUP)
             {
                 assert(vehicle.load < vehicle.capacity && "Vehicle's load should never exceed its capacity!");
 
                 trips[wp.trip_id].pickup_time_s = system_time_s;
+                trips[wp.trip_id].status = TripStatus::PICKED_UP;
                 vehicle.load++;
+
+                fmt::print("[DEBUG] T = {}: Vehicle #{} picked up Trip #{}\n", system_time_s, vehicle.id, wp.trip_id);
             }
             else if (wp.op == WaypointOp::DROPOFF)
             {
                 assert(vehicle.load > 0 && "Vehicle's load should not be zero before a dropoff!");
 
                 trips[wp.trip_id].dropoff_time_s = system_time_s;
+                trips[wp.trip_id].status = TripStatus::DROPPED_OFF;
                 vehicle.load--;
+
+                fmt::print("[DEBUG] T = {}: Vehicle #{} droped off Trip #{}\n", system_time_s, vehicle.id, wp.trip_id);
             }
 
             continue;
         }
 
         // If we can not finish this waypoint, truncate the route.
+        const auto original_distance_m = wp.route.distance_m;
+
         truncate_route_by_time(wp.route, time_s);
         vehicle.pos = wp.route.legs.front().steps.front().poses.front();
+
+        if (update_vehicle_stats)
+        {
+            const auto dist_traveled_m = original_distance_m - wp.route.distance_m;
+            vehicle.dist_traveled_m += dist_traveled_m;
+            vehicle.loaded_dist_traveled_m += dist_traveled_m * vehicle.load;
+        }
 
         vehicle.waypoints.erase(vehicle.waypoints.begin(), vehicle.waypoints.begin() + i);
 

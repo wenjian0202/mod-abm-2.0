@@ -8,6 +8,8 @@
 #include "vehicle.hpp"
 
 #include <fstream>
+#include <chrono>
+#include <ctime>
 
 /// \brief The agent-based modeling platform that simulates the mobility-on-demand system.
 template <typename RouterFunc, typename DemandGeneratorFunc>
@@ -45,6 +47,9 @@ private:
     /// \brief Write the data of the current system state to datalog.
     void write_to_datalog();
 
+    /// \brief Create the report based on the statistical analysis using the simulated data.
+    void create_report();
+
     /// \brief The set of config parameters for the simulation platform.
     PlatformConfig platform_config_;
 
@@ -65,6 +70,9 @@ private:
 
     /// \brief The ofstream that outputs to the datalog.
     std::ofstream fout_datalog;
+
+    /// \brief The total runtime of simulation.
+    std::chrono::duration<double> runtime_;
 };
 
 // Implementation is put in a separate file for clarity and maintainability.

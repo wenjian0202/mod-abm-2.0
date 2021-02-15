@@ -237,7 +237,7 @@ TEST(AdvanceVehicleByTime, return_early_if_time_is_zero)
 
     Waypoint waypoint{Pos{20, 20}, WaypointOp::PICKUP, 0, route};
 
-    Vehicle vehicle{Pos{0, 0}, 2, 0, {waypoint}};
+    Vehicle vehicle{0, Pos{0, 0}, 2, 0, {waypoint}, 0.0, 0.0};
 
     std::vector<Trip> trips = {Trip{}, Trip{}};
 
@@ -251,6 +251,9 @@ TEST(AdvanceVehicleByTime, return_early_if_time_is_zero)
     EXPECT_EQ(vehicle.waypoints.size(), 1);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.distance_m, 40.0);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.duration_s, 8.0);
+
+    EXPECT_DOUBLE_EQ(vehicle.dist_traveled_m, 0.0);
+    EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 0.0);
 }
 
 TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint)
@@ -265,7 +268,7 @@ TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint)
 
     Waypoint waypoint{Pos{20, 20}, WaypointOp::PICKUP, 0, route};
 
-    Vehicle vehicle{Pos{0, 0}, 2, 0, {waypoint}};
+    Vehicle vehicle{0, Pos{0, 0}, 2, 1, {waypoint}, 0.0, 0.0};
 
     std::vector<Trip> trips = {Trip{}, Trip{}};
 
@@ -274,11 +277,14 @@ TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint)
     EXPECT_DOUBLE_EQ(vehicle.pos.lon, 10.0);
     EXPECT_DOUBLE_EQ(vehicle.pos.lat, 10.0);
 
-    EXPECT_EQ(vehicle.load, 0);
+    EXPECT_EQ(vehicle.load, 1);
 
     EXPECT_EQ(vehicle.waypoints.size(), 1);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.distance_m, 20.0);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.duration_s, 4.0);
+
+    EXPECT_DOUBLE_EQ(vehicle.dist_traveled_m, 20.0);
+    EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 20.0);
 }
 
 TEST(AdvanceVehicleByTime, complete_the_first_waypoint)
@@ -293,7 +299,7 @@ TEST(AdvanceVehicleByTime, complete_the_first_waypoint)
 
     Waypoint waypoint{Pos{20, 20}, WaypointOp::PICKUP, 0, route};
 
-    Vehicle vehicle{Pos{0, 0}, 2, 0, {waypoint}};
+    Vehicle vehicle{0, Pos{0, 0}, 2, 1, {waypoint}, 0.0, 0.0};
 
     std::vector<Trip> trips = {Trip{}, Trip{}};
 
@@ -302,9 +308,12 @@ TEST(AdvanceVehicleByTime, complete_the_first_waypoint)
     EXPECT_DOUBLE_EQ(vehicle.pos.lon, 20.0);
     EXPECT_DOUBLE_EQ(vehicle.pos.lat, 20.0);
 
-    EXPECT_EQ(vehicle.load, 1);
+    EXPECT_EQ(vehicle.load, 2);
 
     EXPECT_EQ(vehicle.waypoints.size(), 0);
+
+    EXPECT_DOUBLE_EQ(vehicle.dist_traveled_m, 40.0);
+    EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 40.0);
 
     EXPECT_DOUBLE_EQ(trips[0].pickup_time_s, 1008.0);
 }
@@ -322,7 +331,7 @@ TEST(AdvanceVehicleByTime, not_complete_the_second_waypoint)
     Waypoint waypoint1{Pos{0, 0}, WaypointOp::DROPOFF, 0, Route{40.0, 8.0, {}}};
     Waypoint waypoint2{Pos{20, 20}, WaypointOp::PICKUP, 1, route};
 
-    Vehicle vehicle{Pos{0, 0}, 2, 2, {waypoint1, waypoint2}};
+    Vehicle vehicle{0, Pos{0, 0}, 2, 2, {waypoint1, waypoint2}, 0.0, 0.0};
 
     std::vector<Trip> trips = {Trip{}, Trip{}};
 
@@ -336,6 +345,9 @@ TEST(AdvanceVehicleByTime, not_complete_the_second_waypoint)
     EXPECT_EQ(vehicle.waypoints.size(), 1);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.distance_m, 30.0);
     EXPECT_DOUBLE_EQ(vehicle.waypoints[0].route.duration_s, 6.0);
+
+    EXPECT_DOUBLE_EQ(vehicle.dist_traveled_m, 50.0);
+    EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 90.0);
 
     EXPECT_DOUBLE_EQ(trips[0].dropoff_time_s, 1008.0);
 }

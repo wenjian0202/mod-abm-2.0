@@ -58,6 +58,7 @@ void assign_trip_through_insertion_heuristics(
     // If none of the vehicles can serve the trip, return false.
     if (!res.success)
     {
+        trip.status = TripStatus::WALKAWAY;
         fmt::print("[DEBUG] Failed to assign Trip #{}.\n", trip.id);
 
         return;
@@ -68,7 +69,7 @@ void assign_trip_through_insertion_heuristics(
     insert_trip_to_vehicle(trip, best_vehicle, res.pickup_index, res.dropoff_index, router_func);
 
     fmt::print("[DEBUG] Assigned Trip #{} to Vehicle #{}, which has {} waypoints.\n",
-               trip.id, best_vehicle_index, best_vehicle.waypoints.size());
+               trip.id, best_vehicle.id, best_vehicle.waypoints.size());
 
     return;
 }
@@ -91,17 +92,38 @@ double get_cost_of_waypoints(const std::vector<Waypoint> &waypoints)
     return cost_s;
 }
 
-bool validate_waypoints(const std::vector<Waypoint> &waypoints, const std::vector<Trip> &trips, double system_time_s)
+bool validate_waypoints(
+    const std::vector<Waypoint> &waypoints,
+    const std::vector<Trip> &trips,
+    const Vehicle &vehicle,
+    double system_time_s)
 {
     auto accumulated_time_s = system_time_s;
+    auto load = vehicle.load;
 
     for (const auto &wp : waypoints)
     {
         accumulated_time_s += wp.route.duration_s;
 
+        // The planned pickup time should be no larger than the max allowed pickup time.
         if (wp.op == WaypointOp::PICKUP && accumulated_time_s > trips[wp.trip_id].max_pickup_time_s)
         {
             return false;
+        }
+
+        if (wp.op == WaypointOp::PICKUP)
+        {
+            load++;
+
+            // The load should not exceed the vehicle capacity.
+            if (load > vehicle.capacity)
+            {
+                return false;
+            }
+        }
+        else if (wp.op == WaypointOp::DROPOFF)
+        {
+            load--;
         }
     }
 
@@ -202,7 +224,7 @@ std::pair<bool, double> compute_cost_of_inserting_trip_to_vehicle(
         return {false, 0.0};
     }
 
-    if (!validate_waypoints(wps, trips, system_time_s))
+    if (!validate_waypoints(wps, trips, vehicle, system_time_s))
     {
         return {false, 0.0};
     }

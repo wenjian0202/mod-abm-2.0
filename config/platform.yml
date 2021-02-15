@@ -18,8 +18,8 @@ mod_system_config:
 simulation_config:
   cycle_s: 60.0
   simulation_duration_s: 1200
-  warmup_duration_s: 0
-  winddown_duration_s: 0
+  warmup_duration_s: 600
+  winddown_duration_s: 600
 output_config:
   datalog_config:
     output_datalog: true

@@ -71,12 +71,6 @@ std::vector<Request> DemandGenerator::operator()(double target_system_time_s)
         requests.emplace_back(last_request_);
     }
 
-    fmt::print("[DEBUG] T = {}: Generated {} request(s) in this cycle:\n", system_time_s_, requests.size());
-    for (const auto &request : requests)
-    {
-        fmt::print("[DEBUG]  Request at time {}, from ({}, {}) to ({}, {}):\n", request.request_time_s, request.origin.lon, request.origin.lat, request.destination.lon, request.destination.lat);
-    }
-
     return requests;
 }
 
