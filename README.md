@@ -1,36 +1,36 @@
-# `mod-abm-2.0`
-Modern agent-based modeling platform for mobility-on-demand simulations.
+# `mod-abm-2.0` 
+A modern agent-based modeling platform for mobility-on-demand simulations.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="800">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="700">
 
 ## What's `mod-abm-2.0`?
 
-`mod-abm-2.0` is the 2.0 version of our **A**gent-**B**ased **M**odeling platform designed for the simulation of large-scale **M**obility-**o**n-**D**emand operations. The software largely extends and rewrites its original version ([`amod-abm`](https://github.com/wenjian0202/amod-abm/)), which was first developed in 2016 as part of an MIT research project. In this 2.0 version, a lot of new designs have been made possible in pursuit of better scalability and extensibility. This includes:
+The `mod-abm-2.0` is the 2.0 version of our **A**gent-**B**ased **M**odeling platform designed for the simulation of large-scale **M**obility-**o**n-**D**emand operations. The software largely extends and rewrites its original version ([`amod-abm`](https://github.com/wenjian0202/amod-abm/)), which was first developed in 2016 as part of an MIT research project. In this 2.0 version, a lot of new designs have been made possible in pursuit of better scalability and extensibility. This includes:
 - implementation in C++ with native [OSRM](https://github.com/Project-OSRM/osrm-backend) support instead of Python to allow for much optimized runtime performance;
-- user-customizable simulation setups through yaml system configurations, decoupled routing/demand-generating modules and easily transferrable maps to support different use cases and research topics;
+- user-customizable simulations through hierarchical system configurations, decoupled routing/demand-generating modules and easily transferrable maps to support different use cases and research topics;
 - thorough unit tests, conprehensive documentation and modern software development practices.
 
-Almost effortlessly, `mod-abm-2.0` can be set up to simulate city-level mobility-on-demand systems in any urban settings. It creates a free-floating MoD system with a fleet of vehicles and a central dispatcher, and models each of the *agents* (travelers, vehicles, couriers etc.) at the individual level. The simulation can evaluate the system performance with user-defined indicators, such as wait time, travel time, acceptance rate at the traveler side, and vehicle miles traveled, average load and idle time at the operator's side. Additional Python tools are also provided to create animation based on the simulated data for visualization purposes. 
+Almost effortlessly, `mod-abm-2.0` can be set up to simulate city-level mobility-on-demand systems in any urban settings. It creates a free-floating MoD system with a fleet of vehicles and a central dispatcher, and models each of the *agents* (travelers, vehicles, couriers etc.) at the individual level. The simulation will evaluate the system performance based on user-defined indicators, such as wait time, travel time, service rate at the traveler side, and vehicle miles traveled, average load, vehicle idle time at the operator side. Additional Python tools are also provided to create animation from the simulated data for debugging/visualization purposes. 
 
-With all great features aforementioned, `mod-abm-2.0` provides infrastructure and tools to:
+With all great features aforementioned, `mod-abm-2.0` creates opportunities for researchers and planners to:
 - support design and operational decisions (such as fleet size, pricing policies) for MoD systems, shared or non-shared, autonomous or non-autonomous;
-- model traveler behavior and traffic demand;
-- research smart dispatch algorithms w.r.t trip-vehicle assignment, fleet management, and rebalancing, including machine-learning models.
+- model traffic demand and understand travel behavior;
+- evaluate smart dispatch algorithms w.r.t trip-vehicle assignment, fleet management, and rebalancing, including machine-learning models.
 
 Thanks for contributing to `mod-abm-2.0`! 
 
 ## `mod-abm-2.0` Explained
 
-The simulation `main()` function takes three external files as input:
-- platform config file (`.yml`)
-- processed map data file for [OSRM](https://github.com/Project-OSRM/osrm-backend) routing engine (`.osrm`)
-- demand config file (`.yml`)
-The meat part of the simulation is managed by class `Platform`, which interacts with two injected functors `Router` and `DemandGenerator`. In each simulation cycle, `Platform` calls `DemandGenerator` for trip requests and dispatches them to vehicles based on its dispatching strategies (e.g., minimize wait time). `Router`, wrapping around the ORSM backend, provides the shortest routes for any origin/destination pair.   
+The [`main()`](https://github.com/wenjian0202/mod-abm-2.0/blob/main/src/main.cpp) function of the simulation takes three external files as input:
+- platform config file (in `.yml`)
+- pre-processed map data file for [OSRM](https://github.com/Project-OSRM/osrm-backend) routing engine (in `.osrm`)
+- demand config file (in `.yml`)
+The meat part of the simulation is managed by class `Platform`, which also interacts with two injected functors `Router` and `DemandGenerator`. During the simulation, in each cycle, `Platform` invokes `DemandGenerator` to generate trip requests that follows the Poisson process, based on the pre-defined ODs and trip intensities. It then dispatches the trips to vehicles using the selected dispatching strategies (currently, minimize total wait time). When dispatching, `Router` , which wraps around the ORSM backend, is called at high frequency to provide the shortest routes on demand for any origin/destination pair.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/diagram.svg" width="800">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/diagram.svg" width="700">
 
-The `main()` function outputs simulation results in two formats:
-- a report as a quick summary of the simulation performance (through terminal)
+The program outputs simulation results in two formats:
+- a report as a quick summary of the simulation results (through terminal)
 - a detailed datalog for debugging, visualization and in-depth investigation (in `.yml`)
 
 An example of the report is as below:
@@ -52,13 +52,19 @@ An example of the report is as below:
 ----------------------------------------------------------------------------------------------------------------
 ```
 
-We also provide Python tools that processes the output datalog for animation. `fetch_map.py` fetches the background map image for the visualization from [OpenStreetMap](https://www.openstreetmap.org/). `render_video.py` creates animation based on the captured simulation states at each frame from the datalog, and renders video as `.mp4`.
+We also provide Python tools to parse the output datalog and create animation through a two-step process. First, `fetch_map.py` fetches the background map image for the visualization from [OpenStreetMap](https://www.openstreetmap.org/) (you only do it once unless you change the area of study). `render_video.py` then creates animation on top of the background map image using the captured simulation states at each frame from the datalog, and renders video as `.mp4`.
 
-Example of the input configs, output datalog, as well as the rendered video could be found in relavant folders ([config](https://github.com/wenjian0202/mod-abm-2.0/tree/main/config), [datalog](https://github.com/wenjian0202/mod-abm-2.0/tree/main/datalog), [media](https://github.com/wenjian0202/mod-abm-2.0/tree/main/media))in this repo. 
+Example of the input configs, output datalog, as well as the rendered video could be found in the relavant folders ([config](https://github.com/wenjian0202/mod-abm-2.0/tree/main/config), [datalog](https://github.com/wenjian0202/mod-abm-2.0/tree/main/datalog), [media](https://github.com/wenjian0202/mod-abm-2.0/tree/main/media)) of this repo. 
 
 ### ongoing parts
 
+- performance improvement through cached routing results and compressed route representation
+- more debugging printouts, more documentation
+
 ### upcoming features 
+
+- re-optimization of the vehicle-trip assignment for better MoD performance
+- time-variant demand matrix
 
 ## Quick Start
 
