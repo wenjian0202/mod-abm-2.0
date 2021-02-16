@@ -45,7 +45,10 @@ private:
     void dispatch(const std::vector<size_t> &pending_trip_ids);
 
     /// \brief Write the data of the current system state to datalog.
-    void write_to_datalog();
+    void write_state_to_datalog();
+
+    /// \brief Write the data of all trips to datalog after the simulation.
+    void write_trips_to_datalog();
 
     /// \brief Create the report based on the statistical analysis using the simulated data.
     void create_report();

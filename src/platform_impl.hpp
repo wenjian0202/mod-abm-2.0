@@ -64,6 +64,11 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation()
         run_cycle();
     }
 
+    if (platform_config_.output_config.datalog_config.output_datalog)
+    {
+        write_trips_to_datalog();
+    }
+
     // Create report.
     runtime_ = std::chrono::system_clock::now() - start;
     fmt::print("[INFO] Simulation completed. Creating report.\n");
@@ -91,7 +96,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
         for (auto i = 0; i < platform_config_.output_config.video_config.frames_per_cycle; i++)
         {
             advance_vehicles(frame_time_s);
-            write_to_datalog();
+            write_state_to_datalog();
         }
 
         fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s), creating {} frames.\n",
@@ -106,7 +111,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle()
 
         if (platform_config_.output_config.datalog_config.output_datalog && in_main_simulation)
         {
-            write_to_datalog();
+            write_state_to_datalog();
         }
 
         fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s).\n", system_time_s_, platform_config_.simulation_config.cycle_s);
@@ -194,7 +199,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::dispatch(const std::vector<size_
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
+void Platform<RouterFunc, DemandGeneratorFunc>::write_state_to_datalog()
 {
     YAML::Node node;
     node["system_time_s"] = system_time_s_;
@@ -205,8 +210,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
         YAML::Node veh_node;
 
         YAML::Node pos_node;
-        pos_node["lon"] = vehicle.pos.lon;
-        pos_node["lat"] = vehicle.pos.lat;
+        pos_node["lon"] = fmt::format("{:.6f}", vehicle.pos.lon);
+        pos_node["lat"] = fmt::format("{:.6f}", vehicle.pos.lat);
         veh_node["pos"] = std::move(pos_node);
 
         YAML::Node waypoints_node;
@@ -221,8 +226,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
                     for (const auto &pose : step.poses)
                     {
                         YAML::Node leg_node;
-                        leg_node["lon"] = pose.lon;
-                        leg_node["lat"] = pose.lat;
+                        leg_node["lon"] = fmt::format("{:.6f}", pose.lon);
+                        leg_node["lat"] = fmt::format("{:.6f}", pose.lat);
                         waypoint_node.push_back(std::move(leg_node));
                     }
                 }
@@ -231,6 +236,51 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog()
         }
         veh_node["waypoints"] = std::move(waypoints_node);
         node["vehicles"].push_back(std::move(veh_node));
+    }
+
+    YAML::Node node_wrapper;
+    node_wrapper.push_back(node);
+
+    fout_datalog << node_wrapper << std::endl;
+}
+
+template <typename RouterFunc, typename DemandGeneratorFunc>
+void Platform<RouterFunc, DemandGeneratorFunc>::write_trips_to_datalog()
+{
+    YAML::Node node;
+    node["system_time_s"] = system_time_s_;
+
+    // For each of the trips, we write the relavant data in yaml format.
+    for (const auto& trip : trips_)
+    {
+        if (trip.request_time_s <= platform_config_.simulation_config.warmup_duration_s)
+        {
+            continue;
+        }
+        else if (trip.request_time_s > platform_config_.simulation_config.warmup_duration_s + platform_config_.simulation_config.simulation_duration_s)
+        {
+            break;
+        }
+
+        YAML::Node origin_pos_node;
+        origin_pos_node["lon"] = fmt::format("{:.6f}", trip.origin.lon);
+        origin_pos_node["lat"] = fmt::format("{:.6f}", trip.origin.lat);
+
+        YAML::Node destination_pos_node;
+        destination_pos_node["lon"] = fmt::format("{:.6f}", trip.destination.lon);
+        destination_pos_node["lat"] = fmt::format("{:.6f}", trip.destination.lat);
+
+        YAML::Node trip_node;
+        trip_node["id"] = trip.id;
+        trip_node["origin"] = std::move(origin_pos_node);
+        trip_node["destination"] = std::move(destination_pos_node);
+        trip_node["status"] = to_string(trip.status);
+        trip_node["request_time_s"] = trip.request_time_s;
+        trip_node["max_pickup_time_s"] = trip.max_pickup_time_s;
+        trip_node["pickup_time_s"] = trip.pickup_time_s;
+        trip_node["dropoff_time_s"] = trip.dropoff_time_s;
+
+        node["trips"].push_back(std::move(trip_node));
     }
 
     YAML::Node node_wrapper;

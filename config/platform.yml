@@ -9,7 +9,7 @@ area_config:
   lat_max: 22.35
 mod_system_config:
   fleet_config:
-    fleet_size: 10
+    fleet_size: 8
     veh_capacity: 2
     initial_lon: 114.18
     initial_lat: 22.30 
@@ -17,9 +17,9 @@ mod_system_config:
     max_pickup_wait_time_s: 900
 simulation_config:
   cycle_s: 60.0
-  simulation_duration_s: 1200
-  warmup_duration_s: 600
-  winddown_duration_s: 600
+  simulation_duration_s: 600
+  warmup_duration_s: 1200
+  winddown_duration_s: 1200
 output_config:
   datalog_config:
     output_datalog: true

@@ -101,6 +101,36 @@ enum class TripStatus
     WALKAWAY     // the trip isn't served due to constraints in dispatch time/pickup time etc
 };
 
+inline std::string to_string(const TripStatus &s)
+{
+    if (s == TripStatus::UNDEFINED)
+    {
+        return "UNDEFINED";
+    }
+    else if (s == TripStatus::REQUESTED)
+    {
+        return "REQUESTED";
+    }
+    else if (s == TripStatus::DISPATCHED)
+    {
+        return "DISPATCHED";
+    }
+    else if (s == TripStatus::PICKED_UP)
+    {
+        return "PICKED_UP";
+    }
+    else if (s == TripStatus::DROPPED_OFF)
+    {
+        return "DROPPED_OFF";
+    }
+    else if (s == TripStatus::WALKAWAY)
+    {
+        return "WALKAWAY";
+    }
+
+    assert(false && "Bad TripStatus type!");
+}
+
 /// \brief The trip that the simulation managed, containing all relavant data.
 struct Trip
 {
