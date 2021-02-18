@@ -1,0 +1,711 @@
+# The demand Origin-Destination pairs and trip intensities for the simulation platform.
+# Example OD:
+# - origin:
+#     lon: 
+#     lat: 
+#   destination:
+#     lon: 
+#     lat:
+#   trips_per_hour: 
+
+# We use Hong Kong as our case study.
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.18201863920314  # Hong Kong Coliseum
+    lat: 22.301533491055107
+  trips_per_hour: 3
+- origin:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.20971300969043  # Kowloon Bay Sports Ground
+    lat: 22.34511015090938
+  destination:
+    lon: 114.25978354073975  # Tseung Kwan O Station
+    lat: 22.307349010521847
+  trips_per_hour: 3
+- origin:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  destination:
+    lon: 114.20898961932522  # Choi Hung Station
+    lat: 22.334896624492174
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  trips_per_hour: 3
+- origin:
+    lon: 114.1288638046931  # Kennedy Town Station
+    lat: 22.281334725500905
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.18719535223207  # Deep Water Bay Beach
+    lat: 22.24531852232065
+  destination:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712  
+  trips_per_hour: 3
+- origin:
+    lon: 114.16582702558549  # Tamar Park
+    lat: 22.28156703998581
+  destination:
+    lon: 114.16932402101104  # Mong Kok Station
+    lat: 22.31925195270695
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.18957713213553  # Whampoa Station
+    lat: 22.305543479014023
+  trips_per_hour: 3
+- origin:
+    lon: 114.16609002522111  # Austin Station
+    lat: 22.305268610646998
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.26948227336361  # Lohas Park Station
+    lat: 22.29620972351717
+  destination:
+    lon: 114.21606908983561  # Tai Koo Station
+    lat: 22.285146658549014
+  trips_per_hour: 3
+- origin:
+    lon: 114.17458365733388  # Queen Elizabeth Hospital
+    lat: 22.309014107739145
+  destination:
+    lon: 114.18645354021692  # The HKJC Happy Valley Old Clubhouse
+    lat: 22.26578147594572
+  trips_per_hour: 3
+- origin:
+    lon: 114.15546700568177  # Lan Kwai Fong
+    lat: 22.281445254428185
+  destination:
+    lon: 114.1737246284206  # Central Plaza
+    lat: 22.280374779749437
+  trips_per_hour: 3
+- origin:
+    lon: 114.19041619592899  # Kowloon Walled City Park
+    lat: 22.332261798017345
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.15850123645114  # Hoi Fai Road Promenade
+    lat: 22.316960068765834
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  destination:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  trips_per_hour: 3
+- origin:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  destination:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  trips_per_hour: 3
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  trips_per_hour: 3
+- origin:
+    lon: 114.18201863920314  # Hong Kong Coliseum
+    lat: 22.301533491055107
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.20971300969043  # Kowloon Bay Sports Ground
+    lat: 22.34511015090938
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.25978354073975  # Tseung Kwan O Station
+    lat: 22.307349010521847
+  destination:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  trips_per_hour: 3
+- origin:
+    lon: 114.20898961932522  # Choi Hung Station
+    lat: 22.334896624492174
+  destination:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.18719535223207  # Deep Water Bay Beach
+    lat: 22.24531852232065
+  destination:
+    lon: 114.1288638046931  # Kennedy Town Station
+    lat: 22.281334725500905  
+  trips_per_hour: 3
+- origin:
+    lon: 114.16582702558549  # Tamar Park
+    lat: 22.28156703998581
+  destination:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  trips_per_hour: 3
+- origin:
+    lon: 114.16932402101104  # Mong Kok Station
+    lat: 22.31925195270695
+  destination:
+    lon: 114.18957713213553  # Whampoa Station
+    lat: 22.305543479014023
+  trips_per_hour: 3
+- origin:
+    lon: 114.16609002522111  # Austin Station
+    lat: 22.305268610646998
+  destination:
+    lon: 114.26948227336361  # Lohas Park Station
+    lat: 22.29620972351717
+  trips_per_hour: 3
+- origin:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  destination:
+    lon: 114.21606908983561  # Tai Koo Station
+    lat: 22.285146658549014
+  trips_per_hour: 3
+- origin:
+    lon: 114.1737246284206  # Central Plaza
+    lat: 22.280374779749437
+  destination:
+    lon: 114.18645354021692  # The HKJC Happy Valley Old Clubhouse
+    lat: 22.26578147594572
+  trips_per_hour: 3
+- origin:
+    lon: 114.15546700568177  # Lan Kwai Fong
+    lat: 22.281445254428185
+  destination:
+    lon: 114.17458365733388  # Queen Elizabeth Hospital
+    lat: 22.309014107739145
+  trips_per_hour: 3
+- origin:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.15850123645114  # Hoi Fai Road Promenade
+    lat: 22.316960068765834
+  destination:
+    lon: 114.19041619592899  # Kowloon Walled City Park
+    lat: 22.332261798017345
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  trips_per_hour: 3
+- origin:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  trips_per_hour: 3
+- origin:
+    lon: 114.18201863920314  # Hong Kong Coliseum
+    lat: 22.301533491055107
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  trips_per_hour: 3
+- origin:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  destination:
+    lon: 114.25978354073975  # Tseung Kwan O Station
+    lat: 22.307349010521847
+  trips_per_hour: 3
+- origin:
+    lon: 114.20971300969043  # Kowloon Bay Sports Ground
+    lat: 22.34511015090938
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.1288638046931  # Kennedy Town Station
+    lat: 22.281334725500905
+  destination:
+    lon: 114.20898961932522  # Choi Hung Station
+    lat: 22.334896624492174
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.16932402101104  # Mong Kok Station
+    lat: 22.31925195270695
+  trips_per_hour: 3
+- origin:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  destination:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712  
+  trips_per_hour: 3
+- origin:
+    lon: 114.18719535223207  # Deep Water Bay Beach
+    lat: 22.24531852232065
+  destination:
+    lon: 114.16582702558549  # Tamar Park
+    lat: 22.28156703998581
+  trips_per_hour: 3
+- origin:
+    lon: 114.17458365733388  # Queen Elizabeth Hospital
+    lat: 22.309014107739145
+  destination:
+    lon: 114.18957713213553  # Whampoa Station
+    lat: 22.305543479014023
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.26948227336361  # Lohas Park Station
+    lat: 22.29620972351717
+  destination:
+    lon: 114.16609002522111  # Austin Station
+    lat: 22.305268610646998
+  trips_per_hour: 3
+- origin:
+    lon: 114.21606908983561  # Tai Koo Station
+    lat: 22.285146658549014
+  destination:
+    lon: 114.18645354021692  # The HKJC Happy Valley Old Clubhouse
+    lat: 22.26578147594572
+  trips_per_hour: 3
+- origin:
+    lon: 114.15546700568177  # Lan Kwai Fong
+    lat: 22.281445254428185
+  destination:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  trips_per_hour: 3
+- origin:
+    lon: 114.19041619592899  # Kowloon Walled City Park
+    lat: 22.332261798017345
+  destination:
+    lon: 114.1737246284206  # Central Plaza
+    lat: 22.280374779749437
+  trips_per_hour: 3
+- origin:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.15850123645114  # Hoi Fai Road Promenade
+    lat: 22.316960068765834
+  trips_per_hour: 3
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  destination:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  trips_per_hour: 3
+- origin:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  trips_per_hour: 3
+- origin:
+    lon: 114.20898961932522  # Choi Hung Station
+    lat: 22.334896624492174
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.18201863920314  # Hong Kong Coliseum
+    lat: 22.301533491055107
+  destination:
+    lon: 114.20971300969043  # Kowloon Bay Sports Ground
+    lat: 22.34511015090938
+  trips_per_hour: 3
+- origin:
+    lon: 114.25978354073975  # Tseung Kwan O Station
+    lat: 22.307349010521847
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  trips_per_hour: 3
+- origin:
+    lon: 114.16932402101104  # Mong Kok Station
+    lat: 22.31925195270695
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.1288638046931  # Kennedy Town Station
+    lat: 22.281334725500905  
+  trips_per_hour: 3
+- origin:
+    lon: 114.16582702558549  # Tamar Park
+    lat: 22.28156703998581
+  destination:
+    lon: 114.18719535223207  # Deep Water Bay Beach
+    lat: 22.24531852232065
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.21606908983561  # Tai Koo Station
+    lat: 22.285146658549014
+  trips_per_hour: 3
+- origin:
+    lon: 114.18957713213553  # Whampoa Station
+    lat: 22.305543479014023
+  destination:
+    lon: 114.26948227336361  # Lohas Park Station
+    lat: 22.29620972351717
+  trips_per_hour: 3
+- origin:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  destination:
+    lon: 114.16609002522111  # Austin Station
+    lat: 22.305268610646998
+  trips_per_hour: 3
+- origin:
+    lon: 114.15850123645114  # Hoi Fai Road Promenade
+    lat: 22.316960068765834
+  destination:
+    lon: 114.18645354021692  # The HKJC Happy Valley Old Clubhouse
+    lat: 22.26578147594572
+  trips_per_hour: 3
+- origin:
+    lon: 114.1737246284206  # Central Plaza
+    lat: 22.280374779749437
+  destination:
+    lon: 114.17458365733388  # Queen Elizabeth Hospital
+    lat: 22.309014107739145
+  trips_per_hour: 3
+- origin:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  destination:
+    lon: 114.15546700568177  # Lan Kwai Fong
+    lat: 22.281445254428185
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.19041619592899  # Kowloon Walled City Park
+    lat: 22.332261798017345
+  trips_per_hour: 3
+- origin:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  destination:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  trips_per_hour: 3
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3
+- origin:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  destination:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  trips_per_hour: 3
+- origin:
+    lon: 114.18201863920314  # Hong Kong Coliseum
+    lat: 22.301533491055107
+  destination:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  trips_per_hour: 3
+- origin:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  destination:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  trips_per_hour: 3
+- origin:
+    lon: 114.25978354073975  # Tseung Kwan O Station
+    lat: 22.307349010521847
+  destination:
+    lon: 114.20971300969043  # Kowloon Bay Sports Ground
+    lat: 22.34511015090938
+  trips_per_hour: 3
+- origin:
+    lon: 114.18957713213553  # Whampoa Station
+    lat: 22.305543479014023
+  destination:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.20898961932522  # Choi Hung Station
+    lat: 22.334896624492174
+  trips_per_hour: 3
+- origin:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  destination:
+    lon: 114.1288638046931  # Kennedy Town Station
+    lat: 22.281334725500905  
+  trips_per_hour: 3
+- origin:
+    lon: 114.16582702558549  # Tamar Park
+    lat: 22.28156703998581
+  destination:
+    lon: 114.18719535223207  # Deep Water Bay Beach
+    lat: 22.24531852232065
+  trips_per_hour: 3
+- origin:
+    lon: 114.16932402101104  # Mong Kok Station
+    lat: 22.31925195270695
+  destination:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  trips_per_hour: 3
+- origin:
+    lon: 114.16609002522111  # Austin Station
+    lat: 22.305268610646998
+  destination:
+    lon: 114.26948227336361  # Lohas Park Station
+    lat: 22.29620972351717
+  trips_per_hour: 3
+- origin:
+    lon: 114.26285818044906  # Hong Kong University of Science and Technology
+    lat: 22.337471936626493
+  destination:
+    lon: 114.15850123645114  # Hoi Fai Road Promenade
+    lat: 22.316960068765834
+  trips_per_hour: 3
+- origin:
+    lon: 114.21606908983561  # Tai Koo Station
+    lat: 22.285146658549014
+  destination:
+    lon: 114.18645354021692  # The HKJC Happy Valley Old Clubhouse
+    lat: 22.26578147594572
+  trips_per_hour: 3
+- origin:
+    lon: 114.1737246284206  # Central Plaza
+    lat: 22.280374779749437
+  destination:
+    lon: 114.17458365733388  # Queen Elizabeth Hospital
+    lat: 22.309014107739145
+  trips_per_hour: 3
+- origin:
+    lon: 114.15546700568177  # Lan Kwai Fong
+    lat: 22.281445254428185
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.16490186070844  # Hong Kong West Kowloon Station
+    lat: 22.304400695672847
+  destination:
+    lon: 114.19041619592899  # Kowloon Walled City Park
+    lat: 22.332261798017345
+  trips_per_hour: 3
+- origin:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  destination:
+    lon: 114.1850476425779  # Causeway Bay
+    lat: 22.280307150231902
+  trips_per_hour: 3
+- origin:
+    lon: 114.17217079568039  # Tsim Sha Tsui
+    lat: 22.297535032613837
+  destination:
+    lon: 114.17565033839601  # Ocean Park
+    lat: 22.247115082565642
+  trips_per_hour: 3
+- origin:
+    lon: 114.13598336133562  # The University of Hong Kong
+    lat: 22.28344162014816
+  destination:
+    lon: 114.17759582417413  # Hong Kong Science Museum
+    lat: 22.30129509277974
+  trips_per_hour: 3
+- origin:
+    lon: 114.15820885890395  # Central Station
+    lat: 22.281829606489712
+  destination:
+    lon: 114.18432251437184  # Lion Rock Park
+    lat: 22.344998141891313
+  trips_per_hour: 3
+- origin:
+    lon: 114.15319159788898  # Caritas Medical Centre
+    lat: 22.341604213877915
+  destination:
+    lon: 114.17082805300382  # Hong Kong Arts Centre
+    lat: 22.280246328557503
+  trips_per_hour: 3

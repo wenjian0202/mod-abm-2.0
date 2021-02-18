@@ -20,7 +20,7 @@ int main(int argc, const char *argv[])
                            "  <arg1> is the path to the platform config file. \n"
                            "  <arg2> is the path to the orsm map data. \n"
                            "  <arg3> is the path to the demand config file. \n"
-                           "- Example: {} \"./config/platform.yml\" \"../osrm/map/china-latest.osrm\" \"./config/demand.yml\" \n",
+                           "- Example: {} \"./config/platform.yml\" \"../osrm/map/hongkong.osrm\" \"./config/demand.yml\" \n",
                    argv[0]);
         return -1;
     }

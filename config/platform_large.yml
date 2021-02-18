@@ -1,0 +1,31 @@
+# The set of config parameters for the simulation platform.
+# See src/types.hpp for detailed definitions.
+
+# We use Hong Kong as our case study.
+area_config: 
+  lon_min: 114.10
+  lon_max: 114.30
+  lat_min: 22.20
+  lat_max: 22.35
+mod_system_config:
+  fleet_config:
+    fleet_size: 50
+    veh_capacity: 2
+    initial_lon: 114.18
+    initial_lat: 22.30 
+  request_config:
+    max_pickup_wait_time_s: 900
+simulation_config:
+  cycle_s: 60.0
+  simulation_duration_s: 1200
+  warmup_duration_s: 1200
+  winddown_duration_s: 1200
+output_config:
+  datalog_config:
+    output_datalog: false
+    path_to_output_datalog: "./datalog/datalog.yml"
+  video_config:
+    render_video: false
+    path_to_output_video: "./media/demo.mp4"
+    frames_per_cycle: 10
+    replay_speed: 60.0

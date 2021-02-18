@@ -109,18 +109,19 @@ make install
 cd ..
 cd ..
 ```
-We also need a map that the routing engine (hence our simulation platform) will operate on. In our case, Hong Kong will be the area of interest (thanks to our HKU partnership!). Make a `map` subfolder and download the OpenStreetMap map extracts that contains the area from [geofabrik](https://www.geofabrik.de/data/download.html).
+We also need a map that the routing engine (hence our simulation platform) will operate on. The raw [OpenStreetMap](https://www.openstreetmap.org/) map data are encoded in `*.osm.pbf` format and many map extract [servers](https://wiki.openstreetmap.org/wiki/Planet.osm) offers downloading the whole world map or that of a specific region/country. [Protomaps](https://protomaps.com/extracts) is one of the best that allow us to extract rectangular area or draw polygon (good for small case study of city-scale operations). For larger areas (say, California of US, or Germany as a whole), [Geofabrik](https://download.geofabrik.de/) is another good alternative.
+ 
+In our case, Hong Kong will be the area of interest (thanks to our HKU partnership!). Make a `map` subfolder: 
 ```
 mkdir map
-cd map
-wget http://download.geofabrik.de/asia/china-latest.osm.pbf
-cd ..
 ```
+We download the Hong Kong map extract from [Protomaps](https://protomaps.com/extracts) and name it `hongkong.osm.pbf`. Make sure we have moved the downloaded file into the `osrm/map` subfolder before the following steps.
+
 Several more additional steps are required to pre-process the map data, which largely enhance the routing capabilities by allowing the use of Multi-Level Dijkstra (MLD).
 ```
-./osrm-backend/build/osrm-extract ./map/china-latest.osm.pbf -p osrm-backend/profiles/car.lua
-./osrm-backend/build/osrm-partition ./map/china-latest.osrm
-./osrm-backend/build/osrm-customize ./map/china-latest.osrm
+./osrm-backend/build/osrm-extract ./map/hongkong.osm.pbf -p osrm-backend/profiles/car.lua
+./osrm-backend/build/osrm-partition ./map/hongkong.osrm
+./osrm-backend/build/osrm-customize ./map/hongkong.osrm
 ```
 
 ### Run `mod-abm-2.0`
@@ -142,7 +143,7 @@ cmake --build build
 
 An exmaple command line for running the simulation is:
 ```
-./build/main "./config/platform.yml" "../osrm/map/china-latest.osrm" "./config/demand.yml"
+./build/main "./config/platform.yml" "../osrm/map/hongkong.osrm" "./config/demand.yml"
 ```
 Note that the `main()` function takes three arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the config files to, for example, change fleet size, or use a different demand matrix.
 
