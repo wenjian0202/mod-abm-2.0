@@ -144,7 +144,7 @@ std::pair<bool, double> get_pickup_time(
     auto index = 0;
     while (index < pickup_index)
     {
-        auto route_response = router_func(pos, vehicle.waypoints[index].pos);
+        auto route_response = router_func(pos, vehicle.waypoints[index].pos, RoutingType::FULL_ROUTE);
 
         if (route_response.status != RoutingStatus::OK)
         {
@@ -155,7 +155,7 @@ std::pair<bool, double> get_pickup_time(
         pickup_time_s += route_response.route.duration_s;
     }
 
-    auto route_response = router_func(pos, trip.origin);
+    auto route_response = router_func(pos, trip.origin, RoutingType::FULL_ROUTE);
 
     if (route_response.status != RoutingStatus::OK)
     {
@@ -266,7 +266,7 @@ std::vector<Waypoint> generate_waypoints(
     {
         if (index == pickup_index)
         {
-            auto route_response = router_func(pos, trip.origin);
+            auto route_response = router_func(pos, trip.origin, RoutingType::FULL_ROUTE);
 
             if (route_response.status != RoutingStatus::OK)
             {
@@ -279,7 +279,7 @@ std::vector<Waypoint> generate_waypoints(
 
         if (index == dropoff_index)
         {
-            auto route_response = router_func(pos, trip.destination);
+            auto route_response = router_func(pos, trip.destination, RoutingType::FULL_ROUTE);
 
             if (route_response.status != RoutingStatus::OK)
             {
@@ -295,7 +295,7 @@ std::vector<Waypoint> generate_waypoints(
             return ret;
         }
 
-        auto route_response = router_func(pos, vehicle.waypoints[index].pos);
+        auto route_response = router_func(pos, vehicle.waypoints[index].pos, RoutingType::FULL_ROUTE);
 
         if (route_response.status != RoutingStatus::OK)
         {

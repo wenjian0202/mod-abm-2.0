@@ -17,3 +17,6 @@ x64-Release/
 
 # macOS files
 .DS_Store
+
+# clang
+.clang-format

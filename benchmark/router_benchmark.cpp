@@ -5,23 +5,35 @@
 
 #include <benchmark/benchmark.h>
 
-static void BenchmarkRouter(benchmark::State &state)
-{
+static void BenchmarkRouterTimeOnly(benchmark::State &state) {
     // Set up the router
     Router router("../osrm/map/hongkong.osrm");
 
-    for (auto _ : state)
-    {
+    for (auto _ : state) {
         // Time the code
         Pos origin{113.93593149478123, 22.312648328005512};
         Pos destination{114.13602296340699, 22.28328541732128};
 
-        auto ret = router(origin, destination);
+        auto ret = router(origin, destination, RoutingType::TIME_ONLY);
+    }
+}
+
+static void BenchmarkRouterWithSteps(benchmark::State &state) {
+    // Set up the router
+    Router router("../osrm/map/hongkong.osrm");
+
+    for (auto _ : state) {
+        // Time the code
+        Pos origin{113.93593149478123, 22.312648328005512};
+        Pos destination{114.13602296340699, 22.28328541732128};
+
+        auto ret = router(origin, destination, RoutingType::FULL_ROUTE);
     }
 }
 
 // Register the function as a benchmark
-BENCHMARK(BenchmarkRouter);
+BENCHMARK(BenchmarkRouterTimeOnly);
+BENCHMARK(BenchmarkRouterWithSteps);
 
 // Run the benchmark
 BENCHMARK_MAIN();
