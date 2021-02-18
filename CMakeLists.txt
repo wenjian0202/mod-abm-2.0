@@ -69,10 +69,12 @@ FetchContent_Declare(
 FetchContent_GetProperties(googletest)
 if(NOT googletest_POPULATED)
   FetchContent_Populate(googletest)
+  message(STATUS ${googletest_SOURCE_DIR})
+  message(STATUS ${googletest_BINARY_DIR})
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
-# Add Google bekchmark suite
+# Add Google benchmark suite
 FetchContent_Declare(
   googlebenchmark
   GIT_REPOSITORY https://github.com/google/benchmark.git
@@ -82,9 +84,7 @@ FetchContent_GetProperties(googlebenchmark)
 if(NOT benchmark_POPULATED)
   set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
   set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
-  FetchContent_Populate(googlebenchmark)
-  add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR} EXCLUDE_FROM_ALL)
-  set(BENCHMARK_INCLUDE_DIR ${benchmark_SOURCE_DIR}/include)
+  FetchContent_MakeAvailable(googlebenchmark)
 endif()
 
 ########################################################################

@@ -7,7 +7,7 @@
 
 TEST(Router, construct_router_and_route)
 {
-    Router router("../osrm/data/china-latest.osrm");
+    Router router("../osrm/map/china-latest.osrm");
 
     Pos origin{114.16490186070844, 22.304400695672847};     // Hong Kong West Kowloon Station
     Pos destination{114.13598336133562, 22.28344162014816}; // The University of Hong Kong
@@ -24,7 +24,7 @@ TEST(Router, construct_router_and_route)
 
 TEST(Router, construct_router_and_route_with_invalid_origin)
 {
-    Router router("../osrm/data/china-latest.osrm");
+    Router router("../osrm/map/china-latest.osrm");
 
     Pos origin{360, 100};                                   // Bad origin input
     Pos destination{114.13598336133562, 22.28344162014816}; // The University of Hong Kong

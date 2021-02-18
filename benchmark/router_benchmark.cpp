@@ -8,7 +8,7 @@
 static void BenchmarkRouter(benchmark::State &state)
 {
     // Set up the router
-    Router router("../osrm/data/china-latest.osrm");
+    Router router("../osrm/map/china-latest.osrm");
 
     for (auto _ : state)
     {

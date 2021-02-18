@@ -86,7 +86,7 @@ We recommend that `OSRM` and its other dependencies are installed in a separate 
 Start from the desired working directory, we create a `osrm` folder and jump into it.
 ```
 mkdir osrm
-cd orsm
+cd osrm
 ```
 Manually install `lua@5.3`.
 ```
@@ -142,7 +142,7 @@ cmake --build build
 
 An exmaple command line for running the simulation is:
 ```
-./build/main "./config/platform.yml" "../osrm/data/china-latest.osrm" "./config/demand.yml"
+./build/main "./config/platform.yml" "../osrm/map/china-latest.osrm" "./config/demand.yml"
 ```
 Note that the `main()` function takes three arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the config files to, for example, change fleet size, or use a different demand matrix.
 
