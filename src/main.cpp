@@ -7,26 +7,37 @@
 #include "router.hpp"
 #include "types.hpp"
 
+#include <cstddef>
+#include <cstdlib>
 #include <fmt/format.h>
 #include <yaml-cpp/yaml.h>
 
 int main(int argc, const char *argv[]) {
     // Check the input arugment list.
-    if (argc != 4) {
+    if (argc < 4 || argc > 5) {
         fmt::print(stderr,
-                   "[ERROR] We need exact 3 arguments aside from the program name for correct "
+                   "[ERROR] We need 3 or 4 arguments aside from the program name for correct "
                    "execution! \n"
                    "- Usage: <prog name> <arg1> <arg2> <arg3> <arg4>. \n"
                    "  <arg1> is the path to the platform config file. \n"
                    "  <arg2> is the path to the orsm map data. \n"
                    "  <arg3> is the path to the demand config file. \n"
+                   "  <arg4> is the seed to the random number generator. If not provided, rand() "
+                   "will use the current time as seed.\n"
                    "- Example: {} \"./config/platform.yml\" \"../osrm/map/hongkong.osrm\" "
-                   "\"./config/demand.yml\" \n",
+                   "\"./config/demand.yml\" 1\n",
                    argv[0]);
         return -1;
     }
 
-    // Initiate the router with the osrm data
+    // Seed the random number generator.
+    if (argc == 5) {
+        srand(std::stoi(argv[4]));
+    } else {
+        srand(time(0));
+    }
+
+    // Initiate the router with the osrm data.
     Router router{argv[2]};
 
     // Create the demand generator based on the input demand file.

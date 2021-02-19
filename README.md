@@ -143,9 +143,9 @@ cmake --build build
 
 An exmaple command line for running the simulation is:
 ```
-./build/main "./config/platform.yml" "../osrm/map/hongkong.osrm" "./config/demand.yml"
+./build/main "./config/platform.yml" "../osrm/map/hongkong.osrm" "./config/demand.yml" 1
 ```
-Note that the `main()` function takes three arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the config files to, for example, change fleet size, or use a different demand matrix.
+Note that the `main()` function takes three compulsory arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the input config files to, for example, change fleet size, or use a different demand matrix. An additional optional argument is the seed to the random number generator. Using the same seed in multiple runs allows for reproducing the same sim results deterministically. If not provided, the system will use the current time as seed (and you end up having fresh results in each new run).
 
 The simulation runs and outputs a report. An example report is found below:
 ```
