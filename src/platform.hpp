@@ -7,20 +7,17 @@
 #include "types.hpp"
 #include "vehicle.hpp"
 
-#include <fstream>
 #include <chrono>
 #include <ctime>
+#include <fstream>
 
 /// \brief The agent-based modeling platform that simulates the mobility-on-demand system.
-template <typename RouterFunc, typename DemandGeneratorFunc>
-class Platform
-{
-public:
+template <typename RouterFunc, typename DemandGeneratorFunc> class Platform {
+  public:
     /// \brief Constructor.
-    explicit Platform(
-        PlatformConfig _platform_config,
-        RouterFunc _router_func,
-        DemandGeneratorFunc _demand_generator_func);
+    explicit Platform(PlatformConfig _platform_config,
+                      RouterFunc _router_func,
+                      DemandGeneratorFunc _demand_generator_func);
 
     /// \brief Destructor.
     ~Platform();
@@ -34,14 +31,16 @@ public:
     /// \brief Run simulation. The master function that manages the entire simulation process.
     void run_simulation();
 
-private:
+  private:
     /// \brief Run simulation for one cycle. Invoked repetetively by run_simulation().
     void run_cycle();
 
-    /// \brief Advance all vehicles for given time and move forward the system time. Invoked by run_cycle().
+    /// \brief Advance all vehicles for given time and move forward the system time. Invoked by
+    /// run_cycle().
     void advance_vehicles(double time_s);
 
-    /// \brief Dispatch vehicles to serve pending trips. Invoked at the end of the cycle by run_cycle().
+    /// \brief Dispatch vehicles to serve pending trips. Invoked at the end of the cycle by
+    /// run_cycle().
     void dispatch(const std::vector<size_t> &pending_trip_ids);
 
     /// \brief Write the data of the current system state to datalog.

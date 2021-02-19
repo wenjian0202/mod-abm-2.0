@@ -6,8 +6,7 @@
 #include "types.hpp"
 
 /// \brief Config that describes the simulated area.
-struct AreaConfig
-{
+struct AreaConfig {
     double lon_min = 0.0; // max longitude accepted
     double lon_max = 0.0; // min longitude accepted
     double lat_min = 0.0; // max latitude accepted
@@ -15,8 +14,7 @@ struct AreaConfig
 };
 
 /// \brief Config that describes the fleet.
-struct FleetConfig
-{
+struct FleetConfig {
     size_t fleet_size = 10;   // fleet size
     size_t veh_capacity = 2;  // vehicle capacity, 1 = non-shared, >2 is shared
     double initial_lon = 0.0; // max longitude accepted
@@ -24,53 +22,48 @@ struct FleetConfig
 };
 
 /// \brief Config that describes the requests.
-struct RequestConfig
-{
-    double max_pickup_wait_time_s = 600; // the max wait time allowed before a traveler is picked up.
+struct RequestConfig {
+    double max_pickup_wait_time_s =
+        600; // the max wait time allowed before a traveler is picked up.
 };
 
 /// \brief Config that describes the target MoD system.
-struct MoDSystemConfig
-{
+struct MoDSystemConfig {
     FleetConfig fleet_config;
     RequestConfig request_config;
 };
 
 /// \brief Config that describes the simulation statistics.
-struct SimulationConfig
-{
-    double cycle_s = 30.0;               // the cycle every x second the platform dispatches the requests in batch
-    double simulation_duration_s = 3600; // the main period during which the simulated data are analyzed
-    double warmup_duration_s = 1800;     // the period before the main sim for system to build up states
-    double winddown_duration_s = 1800;   // the period after the main sim for system to close trips
+struct SimulationConfig {
+    double cycle_s = 30.0; // the cycle every x second the platform dispatches the requests in batch
+    double simulation_duration_s =
+        3600;                        // the main period during which the simulated data are analyzed
+    double warmup_duration_s = 1800; // the period before the main sim for system to build up states
+    double winddown_duration_s = 1800; // the period after the main sim for system to close trips
 };
 
 /// \brief Config for the output datalog.
-struct DatalogConfig
-{
+struct DatalogConfig {
     bool output_datalog = false;             // true if we output datalog
     std::string path_to_output_datalog = ""; // the path to the output datalog, empty if no output
 };
 
 /// \brief Config for video rendering.
-struct VideoConfig
-{
+struct VideoConfig {
     bool render_video = false;             // true if we render video
     std::string path_to_output_video = ""; // the path to the output video, empty if no rendering
     size_t frames_per_cycle = 10;          // the number of frames in each cycle
-    double replay_speed = 60;              // the speed of the video replay as compared to the actual system time
+    double replay_speed = 60; // the speed of the video replay as compared to the actual system time
 };
 
 /// \brief Config that describes the output modes for datalog and video.
-struct OutputConfig
-{
+struct OutputConfig {
     DatalogConfig datalog_config;
     VideoConfig video_config;
 };
 
 /// \brief The set of config parameters for the simulation platform.
-struct PlatformConfig
-{
+struct PlatformConfig {
     AreaConfig area_config;
     MoDSystemConfig mod_system_config;
     SimulationConfig simulation_config;

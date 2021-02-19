@@ -5,22 +5,19 @@
 
 #include <gtest/gtest.h>
 
-TEST(RoutingResponse, default_initialization)
-{
+TEST(RoutingResponse, default_initialization) {
     RoutingResponse response;
 
     EXPECT_EQ(response.status, RoutingStatus::UNDEFINED);
 }
 
-TEST(Trip, default_initialization)
-{
+TEST(Trip, default_initialization) {
     Trip trip;
 
     EXPECT_EQ(trip.status, TripStatus::UNDEFINED);
 }
 
-TEST(Vehicle, default_initialization)
-{
+TEST(Vehicle, default_initialization) {
     Vehicle vehicle;
 
     EXPECT_EQ(vehicle.capacity, 1);

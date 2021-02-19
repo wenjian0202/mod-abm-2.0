@@ -18,7 +18,7 @@ static void BenchmarkRouterTimeOnly(benchmark::State &state) {
     }
 }
 
-static void BenchmarkRouterWithSteps(benchmark::State &state) {
+static void BenchmarkRouterFullRoute(benchmark::State &state) {
     // Set up the router
     Router router("../osrm/map/hongkong.osrm");
 
@@ -33,7 +33,7 @@ static void BenchmarkRouterWithSteps(benchmark::State &state) {
 
 // Register the function as a benchmark
 BENCHMARK(BenchmarkRouterTimeOnly);
-BENCHMARK(BenchmarkRouterWithSteps);
+BENCHMARK(BenchmarkRouterFullRoute);
 
 // Run the benchmark
 BENCHMARK_MAIN();

@@ -5,20 +5,19 @@
 
 #include "types.hpp"
 
-#include <string>
 #include <memory>
+#include <string>
 
 /// \brief Stateful functor that generates trips based on demand data.
-class DemandGenerator
-{
-public:
+class DemandGenerator {
+  public:
     /// \brief Constructor.
     explicit DemandGenerator(std::string _path_to_demand_data);
 
     /// \brief Main functor that generates the requests until the target system time.
     std::vector<Request> operator()(double target_system_time_s);
 
-private:
+  private:
     /// \brief Generate a request following the Poisson process and trip intensities.
     /// \see the definition of OdWithProb for detailed explaination.
     Request generate_request(double last_request_time_s);

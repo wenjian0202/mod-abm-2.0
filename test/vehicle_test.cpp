@@ -5,8 +5,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(AdvanceStepByTime, return_early_if_time_is_zero)
-{
+TEST(AdvanceStepByTime, return_early_if_time_is_zero) {
     Step step{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
 
     truncate_step_by_time(step, 0.0);
@@ -23,8 +22,7 @@ TEST(AdvanceStepByTime, return_early_if_time_is_zero)
     EXPECT_DOUBLE_EQ(step.poses[2].lat, 5.0);
 }
 
-TEST(AdvanceStepByTime, return_correct_answer_scenario_1)
-{
+TEST(AdvanceStepByTime, return_correct_answer_scenario_1) {
     Step step{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
 
     truncate_step_by_time(step, 0.5);
@@ -41,8 +39,7 @@ TEST(AdvanceStepByTime, return_correct_answer_scenario_1)
     EXPECT_DOUBLE_EQ(step.poses[2].lat, 5.0);
 }
 
-TEST(AdvanceStepByTime, return_correct_answer_scenario_2)
-{
+TEST(AdvanceStepByTime, return_correct_answer_scenario_2) {
     Step step{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
 
     truncate_step_by_time(step, 1.0);
@@ -57,8 +54,7 @@ TEST(AdvanceStepByTime, return_correct_answer_scenario_2)
     EXPECT_DOUBLE_EQ(step.poses[1].lat, 5.0);
 }
 
-TEST(AdvanceStepByTime, return_correct_answer_scenario_3)
-{
+TEST(AdvanceStepByTime, return_correct_answer_scenario_3) {
     Step step{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
 
     truncate_step_by_time(step, 1.5);
@@ -73,8 +69,7 @@ TEST(AdvanceStepByTime, return_correct_answer_scenario_3)
     EXPECT_DOUBLE_EQ(step.poses[1].lat, 5.0);
 }
 
-TEST(AdvanceLegByTime, return_early_if_time_is_zero)
-{
+TEST(AdvanceLegByTime, return_early_if_time_is_zero) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg{20.0, 4.0, {step1, step2}};
@@ -87,8 +82,7 @@ TEST(AdvanceLegByTime, return_early_if_time_is_zero)
     EXPECT_EQ(leg.steps.size(), 2);
 }
 
-TEST(AdvanceLegByTime, return_correct_answer_scenario_1)
-{
+TEST(AdvanceLegByTime, return_correct_answer_scenario_1) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg{20.0, 4.0, {step1, step2}};
@@ -107,8 +101,7 @@ TEST(AdvanceLegByTime, return_correct_answer_scenario_1)
     EXPECT_DOUBLE_EQ(leg.steps[1].duration_s, 2.0);
 }
 
-TEST(AdvanceLegByTime, return_correct_answer_scenario_2)
-{
+TEST(AdvanceLegByTime, return_correct_answer_scenario_2) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg{20.0, 4.0, {step1, step2}};
@@ -124,8 +117,7 @@ TEST(AdvanceLegByTime, return_correct_answer_scenario_2)
     EXPECT_DOUBLE_EQ(leg.steps[0].duration_s, 2.0);
 }
 
-TEST(AdvanceLegByTime, return_correct_answer_scenario_3)
-{
+TEST(AdvanceLegByTime, return_correct_answer_scenario_3) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg{20.0, 4.0, {step1, step2}};
@@ -141,8 +133,7 @@ TEST(AdvanceLegByTime, return_correct_answer_scenario_3)
     EXPECT_DOUBLE_EQ(leg.steps[0].duration_s, 1.0);
 }
 
-TEST(AdvanceRouteByTime, return_early_if_time_is_zero)
-{
+TEST(AdvanceRouteByTime, return_early_if_time_is_zero) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -159,8 +150,7 @@ TEST(AdvanceRouteByTime, return_early_if_time_is_zero)
     EXPECT_EQ(route.legs.size(), 2);
 }
 
-TEST(AdvanceRouteByTime, return_correct_answer_scenario_1)
-{
+TEST(AdvanceRouteByTime, return_correct_answer_scenario_1) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -183,8 +173,7 @@ TEST(AdvanceRouteByTime, return_correct_answer_scenario_1)
     EXPECT_DOUBLE_EQ(route.legs[1].duration_s, 4.0);
 }
 
-TEST(AdvanceRouteByTime, return_correct_answer_scenario_2)
-{
+TEST(AdvanceRouteByTime, return_correct_answer_scenario_2) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -204,8 +193,7 @@ TEST(AdvanceRouteByTime, return_correct_answer_scenario_2)
     EXPECT_DOUBLE_EQ(route.legs[0].duration_s, 4.0);
 }
 
-TEST(AdvanceRouteByTime, return_correct_answer_scenario_3)
-{
+TEST(AdvanceRouteByTime, return_correct_answer_scenario_3) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -225,8 +213,7 @@ TEST(AdvanceRouteByTime, return_correct_answer_scenario_3)
     EXPECT_DOUBLE_EQ(route.legs[0].duration_s, 2.0);
 }
 
-TEST(AdvanceVehicleByTime, return_early_if_time_is_zero)
-{
+TEST(AdvanceVehicleByTime, return_early_if_time_is_zero) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -256,8 +243,7 @@ TEST(AdvanceVehicleByTime, return_early_if_time_is_zero)
     EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 0.0);
 }
 
-TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint)
-{
+TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -287,8 +273,7 @@ TEST(AdvanceVehicleByTime, not_complete_the_first_waypoint)
     EXPECT_DOUBLE_EQ(vehicle.loaded_dist_traveled_m, 20.0);
 }
 
-TEST(AdvanceVehicleByTime, complete_the_first_waypoint)
-{
+TEST(AdvanceVehicleByTime, complete_the_first_waypoint) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};
@@ -318,8 +303,7 @@ TEST(AdvanceVehicleByTime, complete_the_first_waypoint)
     EXPECT_DOUBLE_EQ(trips[0].pickup_time_s, 1008.0);
 }
 
-TEST(AdvanceVehicleByTime, not_complete_the_second_waypoint)
-{
+TEST(AdvanceVehicleByTime, not_complete_the_second_waypoint) {
     Step step1{10.0, 2.0, {Pos{0, 0}, Pos{0, 5}, Pos{5, 5}}};
     Step step2{10.0, 2.0, {Pos{5, 5}, Pos{10, 5}, Pos{10, 10}}};
     Leg leg1{20.0, 4.0, {step1, step2}};

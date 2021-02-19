@@ -21,7 +21,7 @@ TEST(Router, construct_router_and_route_time_only) {
     EXPECT_TRUE(ret.route.legs.empty());
 }
 
-TEST(Router, construct_router_and_route_FULL_ROUTE) {
+TEST(Router, construct_router_and_route_full_route) {
     Router router("../osrm/map/hongkong.osrm");
 
     Pos origin{114.16490186070844, 22.304400695672847};     // Hong Kong West Kowloon Station
