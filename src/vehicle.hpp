@@ -5,23 +5,22 @@
 
 #include "types.hpp"
 
-/// \brief Trucate Step so that the first x seconds worth of route is completed.
-void truncate_step_by_time(Step &step, double time_s);
+/// \brief Trucate Step so that the first x milliseconds worth of route is completed.
+void truncate_step_by_time(Step &step, uint64_t time_ms);
 
-/// \brief Trucate Leg so that the first x seconds worth of route is completed.
-void truncate_leg_by_time(Leg &leg, double time_s);
+/// \brief Trucate Leg so that the first x milliseconds worth of route is completed.
+void truncate_leg_by_time(Leg &leg, uint64_t time_ms);
 
-/// \brief Trucate Route so that the first x seconds worth of route is completed.
-void truncate_route_by_time(Route &route, double time_s);
+/// \brief Trucate Route so that the first x milliseconds worth of route is completed.
+void truncate_route_by_time(Route &route, uint64_t time_ms);
 
-/// \brief Advance the vehicle by x second so that the first x seconds worth of route is completed.
-/// \param vehicle the vehicle that contains waypoints to be processed.
-/// \param trips the reference to the trips. Completing a waypoint might result in change of trip
-/// status. \param system_time_s the current system time in seconds. \param time_s the time in
-/// seconds that we need to advance the system. \param update_vehicle_stats true if we update the
-/// vehicle statistics including distance traveled.
+/// \brief Advance the vehicle by x second so that the first x milliseconds worth of route is
+/// completed. \param vehicle the vehicle that contains waypoints to be processed. \param trips the
+/// reference to the trips. \param system_time_s the current system time in milliseconds. \param
+/// time_s the time in seconds that we need to advance the system. \param update_vehicle_stats true
+/// if we update the vehicle statistics including distance traveled.
 void advance_vehicle(Vehicle &vehicle,
                      std::vector<Trip> &trips,
-                     double system_time_s,
-                     double time_s,
+                     uint64_t system_time_ms,
+                     uint64_t time_ms,
                      bool update_vehicle_stats = true);

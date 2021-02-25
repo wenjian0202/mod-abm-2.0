@@ -21,12 +21,31 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(PlatformConfig _platform_con
                     fleet_config.veh_capacity,
                     0,
                     {},
-                    0.0,
-                    0.0};
+                    0,
+                    0};
     for (auto i = 0; i < fleet_config.fleet_size; i++) {
         vehicle.id = i;
         vehicles_.emplace_back(vehicle);
     }
+
+    // Initialize the simulation times.
+    system_time_ms_ = 0;
+    cycle_ms_ = static_cast<uint64_t>(platform_config_.simulation_config.cycle_s * 1000);
+    if (platform_config_.output_config.video_config.render_video) {
+        assert(cycle_ms_ % platform_config_.output_config.video_config.frames_per_cycle == 0 &&
+               "The cycle time (in milliseconds) must be divisible by frames_per_cycle!");
+        frame_ms_ = cycle_ms_ / platform_config_.output_config.video_config.frames_per_cycle;
+    } else {
+        frame_ms_ = cycle_ms_;
+    }
+    main_sim_start_time_ms_ =
+        static_cast<uint64_t>(platform_config_.simulation_config.warmup_duration_s * 1000);
+    main_sim_end_time_ms_ =
+        main_sim_start_time_ms_ +
+        static_cast<uint64_t>(platform_config_.simulation_config.simulation_duration_s * 1000);
+    system_shutdown_time_ms_ =
+        main_sim_end_time_ms_ +
+        static_cast<uint64_t>(platform_config_.simulation_config.winddown_duration_s * 1000);
 
     // Open the output datalog file.
     const auto &datalog_config = platform_config_.output_config.datalog_config;
@@ -48,17 +67,12 @@ Platform<RouterFunc, DemandGeneratorFunc>::~Platform() {
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation() {
-    // Total simulation time as the sum of warm-up, main simulation, and wind-down.
-    auto total_simulation_time_s = platform_config_.simulation_config.warmup_duration_s +
-                                   platform_config_.simulation_config.simulation_duration_s +
-                                   platform_config_.simulation_config.winddown_duration_s;
-
     fmt::print("[INFO] Simulation started. Running for total {} seconds.\n",
-               total_simulation_time_s);
+               system_shutdown_time_ms_ / 1000.0);
     auto start = std::chrono::system_clock::now();
 
     // Run simulation cycle by cycle.
-    while (system_time_s_ < total_simulation_time_s) {
+    while (system_time_ms_ < system_shutdown_time_ms_) {
         run_cycle();
     }
 
@@ -76,50 +90,58 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation() {
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle() {
-    fmt::print("[INFO] T = {}: Cycle {} is running.\n",
-               system_time_s_,
-               static_cast<int>(system_time_s_ / platform_config_.simulation_config.cycle_s));
+    fmt::print("[INFO] T = {}s: Cycle {} is running.\n",
+               system_time_ms_ / 1000.0,
+               system_time_ms_ / cycle_ms_);
 
-    // Check if we are in main simulation and need to update the vehicle statistics.
-    bool in_main_simulation =
-        system_time_s_ >= platform_config_.simulation_config.warmup_duration_s &&
-        system_time_s_ < platform_config_.simulation_config.warmup_duration_s +
-                             platform_config_.simulation_config.simulation_duration_s;
+    // Advance the vehicles frame by frame.
+    for (auto i = 0; i < cycle_ms_; i += frame_ms_) {
+        advance_vehicles();
 
-    // If we render video, we compute the states of all vehicles for each of the frames in this
-    // cycle and write to datalog.
-    if (platform_config_.output_config.video_config.render_video && in_main_simulation) {
-        const auto frame_time_s = platform_config_.simulation_config.cycle_s /
-                                  platform_config_.output_config.video_config.frames_per_cycle;
-
-        for (auto i = 0; i < platform_config_.output_config.video_config.frames_per_cycle; i++) {
-            advance_vehicles(frame_time_s);
+        if (platform_config_.output_config.datalog_config.output_datalog &&
+            system_time_ms_ >= main_sim_start_time_ms_ && system_time_ms_ < main_sim_end_time_ms_) {
             write_state_to_datalog();
         }
 
-        fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s), creating {} frames.\n",
-                   system_time_s_,
-                   platform_config_.simulation_config.cycle_s,
-                   platform_config_.output_config.video_config.frames_per_cycle);
-    }
-    // Otherwise, we advance the vehicles by the whole cycle time.
-    else {
-        advance_vehicles(platform_config_.simulation_config.cycle_s);
-
-        if (platform_config_.output_config.datalog_config.output_datalog && in_main_simulation) {
-            write_state_to_datalog();
-        }
-
-        fmt::print("[DEBUG] T = {}: Advanced vehicles by {} second(s).\n",
-                   system_time_s_,
-                   platform_config_.simulation_config.cycle_s);
+        fmt::print("[DEBUG] T = {}s: Advanced vehicles by {}s.\n",
+                   system_time_ms_ / 1000.0,
+                   cycle_ms_ / 1000.0);
     }
 
+    // Generate trips.
+    const auto pending_trip_ids = generate_trips();
+
+    // Dispatch the pending trips.
+    dispatch(pending_trip_ids);
+
+    return;
+}
+
+template <typename RouterFunc, typename DemandGeneratorFunc>
+void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles() {
+    // Do it for each of the vehicles independently.
+    for (auto &vehicle : vehicles_) {
+        advance_vehicle(vehicle,
+                        trips_,
+                        system_time_ms_,
+                        frame_ms_,
+                        system_time_ms_ >= main_sim_start_time_ms_ &&
+                            system_time_ms_ < main_sim_end_time_ms_);
+    }
+
+    // Increment the system time.
+    system_time_ms_ += frame_ms_;
+
+    return;
+}
+
+template <typename RouterFunc, typename DemandGeneratorFunc>
+std::vector<size_t> Platform<RouterFunc, DemandGeneratorFunc>::generate_trips() {
     // Get trip requests generated during the past cycle.
-    auto requests = demand_generator_func_(system_time_s_);
+    auto requests = demand_generator_func_(system_time_ms_);
 
-    fmt::print("[DEBUG] T = {}: Generated {} request(s) in this cycle:\n",
-               system_time_s_,
+    fmt::print("[DEBUG] T = {}s: Generated {} request(s) in this cycle:\n",
+               system_time_ms_ / 1000.0,
                requests.size());
 
     // Add the requests into the trip list as well as the pending trips.
@@ -144,59 +166,38 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle() {
         trip.origin = request.origin;
         trip.destination = request.destination;
         trip.status = TripStatus::REQUESTED;
-        trip.request_time_s = request.request_time_s;
-        trip.max_pickup_time_s =
-            request.request_time_s +
-            platform_config_.mod_system_config.request_config.max_pickup_wait_time_s;
+        trip.request_time_ms = request.request_time_ms;
+        trip.max_pickup_time_ms =
+            request.request_time_ms +
+            static_cast<uint64_t>(
+                platform_config_.mod_system_config.request_config.max_pickup_wait_time_s * 1000);
 
         pending_trip_ids.emplace_back(trips_.size());
         trips_.emplace_back(std::move(trip));
 
-        fmt::print(
-            "[DEBUG] Trip #{} requested at T = {}, from origin ({}, {}) to destination ({}, {}):\n",
-            trip.id,
-            trip.request_time_s,
-            trip.origin.lon,
-            trip.origin.lat,
-            trip.destination.lon,
-            trip.destination.lat);
+        fmt::print("[DEBUG] Trip #{} requested at T = {}s, from origin ({}, {}) to destination "
+                   "({}, {}):\n",
+                   trip.id,
+                   trip.request_time_ms / 1000.0,
+                   trip.origin.lon,
+                   trip.origin.lat,
+                   trip.destination.lon,
+                   trip.destination.lat);
     }
 
-    // Dispatch the pending trips.
-    dispatch(pending_trip_ids);
-
-    return;
-}
-
-template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles(double time_s) {
-    // Check if we are in main simulation and need to update the vehicle statistics.
-    bool in_main_simulation =
-        system_time_s_ >= platform_config_.simulation_config.warmup_duration_s &&
-        system_time_s_ < platform_config_.simulation_config.warmup_duration_s +
-                             platform_config_.simulation_config.simulation_duration_s;
-
-    // Do it for each of the vehicles independently.
-    for (auto &vehicle : vehicles_) {
-        advance_vehicle(vehicle, trips_, system_time_s_, time_s, in_main_simulation);
-    }
-
-    // Increment the system time.
-    system_time_s_ += time_s;
-
-    return;
+    return pending_trip_ids;
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::dispatch(
     const std::vector<size_t> &pending_trip_ids) {
-    fmt::print("[DEBUG] T = {}: Dispatching {} pending trip(s) to vehicles.\n",
-               system_time_s_,
+    fmt::print("[DEBUG] T = {}s: Dispatching {} pending trip(s) to vehicles.\n",
+               system_time_ms_ / 1000.0,
                pending_trip_ids.size());
 
     // Assign pending trips to vehicles.
     assign_trips_through_insertion_heuristics(
-        pending_trip_ids, trips_, vehicles_, system_time_s_, router_func_);
+        pending_trip_ids, trips_, vehicles_, system_time_ms_, router_func_);
 
     // Reoptimize the assignments for better level of service.
     // (TODO)
@@ -210,7 +211,7 @@ void Platform<RouterFunc, DemandGeneratorFunc>::dispatch(
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::write_state_to_datalog() {
     YAML::Node node;
-    node["system_time_s"] = system_time_s_;
+    node["system_time_ms"] = system_time_ms_;
 
     // For each of the vehicles, we write the relavant data in yaml format.
     for (const auto &vehicle : vehicles_) {
@@ -250,15 +251,13 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_state_to_datalog() {
 template <typename RouterFunc, typename DemandGeneratorFunc>
 void Platform<RouterFunc, DemandGeneratorFunc>::write_trips_to_datalog() {
     YAML::Node node;
-    node["system_time_s"] = system_time_s_;
+    node["system_time_ms"] = system_time_ms_;
 
     // For each of the trips, we write the relavant data in yaml format.
     for (const auto &trip : trips_) {
-        if (trip.request_time_s <= platform_config_.simulation_config.warmup_duration_s) {
+        if (trip.request_time_ms <= main_sim_start_time_ms_) {
             continue;
-        } else if (trip.request_time_s >
-                   platform_config_.simulation_config.warmup_duration_s +
-                       platform_config_.simulation_config.simulation_duration_s) {
+        } else if (trip.request_time_ms > main_sim_end_time_ms_) {
             break;
         }
 
@@ -275,10 +274,10 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_trips_to_datalog() {
         trip_node["origin"] = std::move(origin_pos_node);
         trip_node["destination"] = std::move(destination_pos_node);
         trip_node["status"] = to_string(trip.status);
-        trip_node["request_time_s"] = trip.request_time_s;
-        trip_node["max_pickup_time_s"] = trip.max_pickup_time_s;
-        trip_node["pickup_time_s"] = trip.pickup_time_s;
-        trip_node["dropoff_time_s"] = trip.dropoff_time_s;
+        trip_node["request_time_ms"] = trip.request_time_ms;
+        trip_node["max_pickup_time_ms"] = trip.max_pickup_time_ms;
+        trip_node["pickup_time_ms"] = trip.pickup_time_ms;
+        trip_node["dropoff_time_ms"] = trip.dropoff_time_ms;
 
         node["trips"].push_back(std::move(trip_node));
     }
@@ -295,17 +294,12 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
                "-----------------------------\n");
 
     // Report the platform configurations
-    auto total_simulation_time_s = platform_config_.simulation_config.warmup_duration_s +
-                                   platform_config_.simulation_config.simulation_duration_s +
-                                   platform_config_.simulation_config.winddown_duration_s;
-
     fmt::print("# System Configurations\n");
-    fmt::print(" - Simulation Config: simulation_duration = {}s ({}s warm-up + {}s main + {}s "
-               "wind-down).\n",
-               total_simulation_time_s,
-               platform_config_.simulation_config.warmup_duration_s,
-               platform_config_.simulation_config.simulation_duration_s,
-               platform_config_.simulation_config.winddown_duration_s);
+    fmt::print(
+        " - Simulation Config: simulation_duration = {}s (main simulation between {}s and {}s).\n",
+        system_shutdown_time_ms_ / 1000.0,
+        main_sim_start_time_ms_ / 1000.0,
+        main_sim_end_time_ms_ / 1000.0);
     fmt::print(" - Fleet Config: fleet_size = {}, vehicle_capacity = {}.\n",
                platform_config_.mod_system_config.fleet_config.fleet_size,
                platform_config_.mod_system_config.fleet_config.veh_capacity);
@@ -319,21 +313,19 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
     fmt::print("# Simulation Runtime\n");
     fmt::print(" - Runtime: total_runtime = {}s, average_runtime_per_simulated_second = {}.\n",
                runtime_.count(),
-               runtime_.count() / total_simulation_time_s);
+               runtime_.count() * 1000 / system_shutdown_time_ms_);
 
     // Report trip status
     auto trip_count = 0;
     auto dispatched_trip_count = 0;
     auto completed_trip_count = 0;
-    auto total_wait_time_s = 0.0;
-    auto total_travel_time_s = 0.0;
+    auto total_wait_time_ms = 0;
+    auto total_travel_time_ms = 0;
 
     for (const auto &trip : trips_) {
-        if (trip.request_time_s <= platform_config_.simulation_config.warmup_duration_s) {
+        if (trip.request_time_ms <= main_sim_start_time_ms_) {
             continue;
-        } else if (trip.request_time_s >
-                   platform_config_.simulation_config.warmup_duration_s +
-                       platform_config_.simulation_config.simulation_duration_s) {
+        } else if (trip.request_time_ms > main_sim_end_time_ms_) {
             break;
         }
 
@@ -347,8 +339,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
 
         if (trip.status == TripStatus::DROPPED_OFF) {
             completed_trip_count++;
-            total_wait_time_s += trip.pickup_time_s - trip.request_time_s;
-            total_travel_time_s += trip.dropoff_time_s - trip.pickup_time_s;
+            total_wait_time_ms += trip.pickup_time_ms - trip.request_time_ms;
+            total_travel_time_ms += trip.dropoff_time_ms - trip.pickup_time_ms;
         }
     }
 
@@ -363,29 +355,29 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
     fmt::print(" - Travel Time: completed = {}.", completed_trip_count);
     if (completed_trip_count > 0) {
         fmt::print(" average_wait_time = {}s, average_travel_time = {}s.\n",
-                   total_wait_time_s / completed_trip_count,
-                   total_travel_time_s / completed_trip_count);
+                   total_wait_time_ms / 1000.0 / completed_trip_count,
+                   total_travel_time_ms / 1000.0 / completed_trip_count);
     } else {
         fmt::print(" PLEASE USE LONGER SIMULATION DURATION TO BE ABLE TO COMPLETE TRIPS!\n");
     }
 
     // Report vehicle status
-    auto total_dist_traveled_m = 0.0;
-    auto total_loaded_dist_traveled_m = 0.0;
+    auto total_dist_traveled_mm = 0;
+    auto total_loaded_dist_traveled_mm = 0;
 
     for (const auto &vehicle : vehicles_) {
-        total_dist_traveled_m += vehicle.dist_traveled_m;
-        total_loaded_dist_traveled_m += vehicle.loaded_dist_traveled_m;
+        total_dist_traveled_mm += vehicle.dist_traveled_mm;
+        total_loaded_dist_traveled_mm += vehicle.loaded_dist_traveled_mm;
     }
 
     fmt::print("# Vehicles\n");
     fmt::print(
         " - Distance: average_distance_traveled = {}m. average_distance_traveled_per_hour = {}m.\n",
-        total_dist_traveled_m / vehicles_.size(),
-        total_dist_traveled_m / vehicles_.size() /
-            platform_config_.simulation_config.simulation_duration_s * 3600);
+        total_dist_traveled_mm / 1000.0 / vehicles_.size(),
+        total_dist_traveled_mm / vehicles_.size() * 3600.0 /
+            (main_sim_end_time_ms_ - main_sim_start_time_ms_));
     fmt::print(" - Load: average_load = {}.\n",
-               total_loaded_dist_traveled_m / total_dist_traveled_m);
+               total_loaded_dist_traveled_mm * 1.0 / total_dist_traveled_mm);
 
     fmt::print("-----------------------------------------------------------------------------------"
                "-----------------------------\n");

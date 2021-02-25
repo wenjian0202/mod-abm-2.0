@@ -11,22 +11,22 @@ PlatformConfig load_platform_config(const std::string &path_to_platform_config) 
     PlatformConfig platform_config;
 
     platform_config.area_config.lon_min =
-        platform_config_yaml["area_config"]["lon_min"].as<double>();
+        platform_config_yaml["area_config"]["lon_min"].as<float>();
     platform_config.area_config.lon_max =
-        platform_config_yaml["area_config"]["lon_max"].as<double>();
+        platform_config_yaml["area_config"]["lon_max"].as<float>();
     platform_config.area_config.lat_min =
-        platform_config_yaml["area_config"]["lat_min"].as<double>();
+        platform_config_yaml["area_config"]["lat_min"].as<float>();
     platform_config.area_config.lat_max =
-        platform_config_yaml["area_config"]["lat_max"].as<double>();
+        platform_config_yaml["area_config"]["lat_max"].as<float>();
 
     platform_config.mod_system_config.fleet_config.fleet_size =
         platform_config_yaml["mod_system_config"]["fleet_config"]["fleet_size"].as<size_t>();
     platform_config.mod_system_config.fleet_config.veh_capacity =
         platform_config_yaml["mod_system_config"]["fleet_config"]["veh_capacity"].as<size_t>();
     platform_config.mod_system_config.fleet_config.initial_lon =
-        platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lon"].as<double>();
+        platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lon"].as<float>();
     platform_config.mod_system_config.fleet_config.initial_lat =
-        platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lat"].as<double>();
+        platform_config_yaml["mod_system_config"]["fleet_config"]["initial_lat"].as<float>();
 
     platform_config.mod_system_config.request_config.max_pickup_wait_time_s =
         platform_config_yaml["mod_system_config"]["request_config"]["max_pickup_wait_time_s"]

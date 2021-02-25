@@ -171,7 +171,7 @@ def main():
                         vehicle["waypoints"][2], lon_min, lon_max, lat_min, lat_max, w, h)
                     wp2[id].set_data(xs, ys)
 
-            system_time_s = datalog[n]["system_time_s"]
+            system_time_ms = datalog[n]["system_time_ms"]
             trips = datalog[num_frames]["trips"]
             dispatched_trips_xs = []
             dispatched_trips_ys = []
@@ -183,7 +183,7 @@ def main():
             completed_trips_count = 0
 
             for trip in trips:
-                if trip["request_time_s"] >= system_time_s:
+                if trip["request_time_ms"] >= system_time_ms:
                     break
 
                 total_trips_count += 1
@@ -194,12 +194,12 @@ def main():
                     completed_trips_count += 1
 
                 if trip["status"] == "WALKAWAY":
-                    if trip["request_time_s"] >= system_time_s - frame_interval_s:
+                    if trip["request_time_ms"] >= system_time_ms - frame_interval_s:
                         x, y = convert_to_x_and_y(
                             trip["origin"], lon_min, lon_max, lat_min, lat_max, w, h)
                         walked_away_trips_xs.append(x)
                         walked_away_trips_ys.append(y)
-                elif trip["status"] != "COMPLETE" or system_time_s <= trip["pickup_time_s"]:
+                elif trip["status"] != "COMPLETE" or system_time_ms <= trip["pickup_time_ms"]:
                     x, y = convert_to_x_and_y(
                         trip["origin"], lon_min, lon_max, lat_min, lat_max, w, h)
                     dispatched_trips_xs.append(x)
@@ -210,7 +210,7 @@ def main():
                 walked_away_trips_xs, walked_away_trips_ys)
 
             text_str = "T = {}s\n{} requested trips ({} accepted, {} completed)".format(
-                system_time_s,
+                system_time_ms / 1000.0,
                 total_trips_count,
                 accepted_trips_count,
                 completed_trips_count)

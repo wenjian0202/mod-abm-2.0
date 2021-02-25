@@ -16,8 +16,8 @@ TEST(Router, construct_router_and_route_time_only) {
     EXPECT_EQ(ret.status, RoutingStatus::OK);
     EXPECT_EQ(ret.message, "");
 
-    EXPECT_TRUE(ret.route.distance_m > 0);
-    EXPECT_TRUE(ret.route.duration_s > 0);
+    EXPECT_EQ(ret.route.distance_mm, 6097500);
+    EXPECT_EQ(ret.route.duration_ms, 494400);
     EXPECT_TRUE(ret.route.legs.empty());
 }
 
@@ -32,8 +32,8 @@ TEST(Router, construct_router_and_route_full_route) {
     EXPECT_EQ(ret.status, RoutingStatus::OK);
     EXPECT_EQ(ret.message, "");
 
-    EXPECT_TRUE(ret.route.distance_m > 0);
-    EXPECT_TRUE(ret.route.duration_s > 0);
+    EXPECT_EQ(ret.route.distance_mm, 6097500);
+    EXPECT_EQ(ret.route.duration_ms, 494400);
     EXPECT_FALSE(ret.route.legs.empty());
 }
 

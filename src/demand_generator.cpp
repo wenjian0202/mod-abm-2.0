@@ -3,6 +3,7 @@
 
 #include "demand_generator.hpp"
 
+#include <cstdint>
 #include <fmt/format.h>
 
 #include <algorithm>
@@ -37,21 +38,21 @@ DemandGenerator::DemandGenerator(std::string _path_to_demand_data) {
                trips_per_hour_);
 }
 
-std::vector<Request> DemandGenerator::operator()(double target_system_time_s) {
-    assert(system_time_s_ <= target_system_time_s &&
+std::vector<Request> DemandGenerator::operator()(uint64_t target_system_time_ms) {
+    assert(system_time_ms_ <= target_system_time_ms &&
            "[ERROR] The target_system_time should be no less than the current system time in "
            "Demand Generator!");
 
     // System time moves forward by a cycle.
-    system_time_s_ = target_system_time_s;
+    system_time_ms_ = target_system_time_ms;
 
     std::vector<Request> requests;
 
-    // Get the last request time. 0.0 indicates the initial state with no requests generated yet.
-    if (last_request_.request_time_s > 0.0) {
-        if (last_request_.request_time_s > system_time_s_) {
-            fmt::print("[DEBUG] T = {}: Generated {} request(s) in this cycle:\n",
-                       system_time_s_,
+    // Get the last request time. 0 indicates the initial state with no requests generated yet.
+    if (last_request_.request_time_ms > 0) {
+        if (last_request_.request_time_ms > system_time_ms_) {
+            fmt::print("[DEBUG] T = {}s: Generated {} request(s) in this cycle:\n",
+                       system_time_ms_ / 1000.0,
                        requests.size());
 
             return requests;
@@ -62,9 +63,9 @@ std::vector<Request> DemandGenerator::operator()(double target_system_time_s) {
 
     // Generate new requests until we go beyond this cycle.
     while (true) {
-        last_request_ = generate_request(last_request_.request_time_s);
+        last_request_ = generate_request(last_request_.request_time_ms);
 
-        if (last_request_.request_time_s > system_time_s_) {
+        if (last_request_.request_time_ms > system_time_ms_) {
             break;
         }
 
@@ -74,7 +75,7 @@ std::vector<Request> DemandGenerator::operator()(double target_system_time_s) {
     return requests;
 }
 
-Request DemandGenerator::generate_request(double last_request_time_s) {
+Request DemandGenerator::generate_request(uint64_t last_request_time_ms) {
     // Generate a random number in [0, 1)
     auto rn = rand() / static_cast<double>(RAND_MAX);
 
@@ -84,7 +85,8 @@ Request DemandGenerator::generate_request(double last_request_time_s) {
     });
 
     // Calculate thg interarrival time that follows the Poisson process
-    auto interval_s = -log(1 - rand() / static_cast<double>(RAND_MAX)) / trips_per_hour_ * 3600;
+    uint64_t interval_ms =
+        -log(1 - rand() / static_cast<double>(RAND_MAX)) / trips_per_hour_ * 3600000;
 
-    return {od_it->origin, od_it->destination, last_request_time_s + interval_s};
+    return {od_it->origin, od_it->destination, last_request_time_ms + interval_ms};
 }

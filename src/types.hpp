@@ -15,29 +15,28 @@
 /// \brief Position encoded in longitude/latitude.
 /// \details lon in [-180, 180), lat in [-90, 90]. Undefined behaviors if out of bound.
 struct Pos {
-    double lon = 0.0;
-    double lat = 0.0;
+    float lon = 0.0;
+    float lat = 0.0;
 };
 
-/// \brief Step of route consisting of distance, duration as well as a vector of continuous
-/// positions.
+/// \brief Step of route consisting of distance, duration and a vector of continuous positions.
 struct Step {
-    double distance_m = 0.0;
-    double duration_s = 0.0;
+    int32_t distance_mm = 0;
+    int32_t duration_ms = 0;
     std::vector<Pos> poses;
 };
 
 /// \brief Leg of route consisting of total distance, total duration as well as a vector of steps.
 struct Leg {
-    double distance_m = 0.0;
-    double duration_s = 0.0;
+    int32_t distance_mm = 0;
+    int32_t duration_ms = 0;
     std::vector<Step> steps;
 };
 
 /// \brief Route consisting of total distance, total duration as well as a vector of legs.
 struct Route {
-    double distance_m = 0.0;
-    double duration_s = 0.0;
+    int32_t distance_mm = 0;
+    int32_t duration_ms = 0;
     std::vector<Leg> legs;
 };
 
@@ -86,7 +85,7 @@ struct OdWithProb {
 struct Request {
     Pos origin;
     Pos destination;
-    double request_time_s = 0.0;
+    uint64_t request_time_ms = 0;
 };
 
 /// \brief The status of the trip.
@@ -123,10 +122,10 @@ struct Trip {
     Pos origin;
     Pos destination;
     TripStatus status = TripStatus::UNDEFINED;
-    double request_time_s = 0.0;
-    double max_pickup_time_s = 0.0;
-    double pickup_time_s = 0.0;
-    double dropoff_time_s = 0.0;
+    int32_t request_time_ms = 0;
+    int32_t max_pickup_time_ms = 0;
+    int32_t pickup_time_ms = 0;
+    int32_t dropoff_time_ms = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +154,7 @@ struct Vehicle {
     size_t capacity = 1;
     size_t load = 0;
     std::vector<Waypoint> waypoints = {};
-    double dist_traveled_m = 0.0; // accumulated distance traveled in meters
-    double loaded_dist_traveled_m =
-        0.0; // accumulated distance traveled, weighted by the load, in meters
+    int32_t dist_traveled_mm = 0; // accumulated distance traveled in meters
+    int32_t loaded_dist_traveled_mm =
+        0; // accumulated distance traveled, weighted by the load, in meters
 };

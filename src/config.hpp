@@ -7,18 +7,18 @@
 
 /// \brief Config that describes the simulated area.
 struct AreaConfig {
-    double lon_min = 0.0; // max longitude accepted
-    double lon_max = 0.0; // min longitude accepted
-    double lat_min = 0.0; // max latitude accepted
-    double lat_max = 0.0; // min latitude accepted
+    float lon_min = 0.0; // max longitude accepted
+    float lon_max = 0.0; // min longitude accepted
+    float lat_min = 0.0; // max latitude accepted
+    float lat_max = 0.0; // min latitude accepted
 };
 
 /// \brief Config that describes the fleet.
 struct FleetConfig {
-    size_t fleet_size = 10;   // fleet size
-    size_t veh_capacity = 2;  // vehicle capacity, 1 = non-shared, >2 is shared
-    double initial_lon = 0.0; // max longitude accepted
-    double initial_lat = 0.0; // min longitude accepted
+    size_t fleet_size = 10;  // fleet size
+    size_t veh_capacity = 2; // vehicle capacity, 1 = non-shared, >2 is shared
+    float initial_lon = 0.0; // max longitude accepted
+    float initial_lat = 0.0; // min longitude accepted
 };
 
 /// \brief Config that describes the requests.
@@ -35,11 +35,11 @@ struct MoDSystemConfig {
 
 /// \brief Config that describes the simulation statistics.
 struct SimulationConfig {
-    double cycle_s = 30.0; // the cycle every x second the platform dispatches the requests in batch
+    double cycle_s = 600; // the cycle every x second the platform dispatches the requests in batch
     double simulation_duration_s =
-        3600;                        // the main period during which the simulated data are analyzed
-    double warmup_duration_s = 1800; // the period before the main sim for system to build up states
-    double winddown_duration_s = 1800; // the period after the main sim for system to close trips
+        600;                         // the main period during which the simulated data are analyzed
+    double warmup_duration_s = 1200; // the period before the main sim for system to build up states
+    double winddown_duration_s = 1200; // the period after the main sim for system to close trips
 };
 
 /// \brief Config for the output datalog.

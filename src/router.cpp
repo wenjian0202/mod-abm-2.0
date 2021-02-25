@@ -76,12 +76,14 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination, Ro
 
         // Let's just use the first route.
         auto &route = routes.values.at(0).get<osrm::json::Object>();
-        const auto distance = route.values["distance"].get<osrm::json::Number>().value;
-        const auto duration = route.values["duration"].get<osrm::json::Number>().value;
+        const uint64_t distance_mm =
+            route.values["distance"].get<osrm::json::Number>().value * 1000;
+        const uint64_t duration_ms =
+            route.values["duration"].get<osrm::json::Number>().value * 1000;
 
         // Return empty response if extract does not contain the default coordinates
         // from above.
-        if (distance == 0 || duration == 0) {
+        if (distance_mm == 0 || duration_ms == 0) {
             response.status = RoutingStatus::EMPTY;
             response.message = "Distance or duration of route is zero. You are "
                                "probably doing a query outside of the OSM extract.";
@@ -92,8 +94,8 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination, Ro
         response.status = RoutingStatus::OK;
 
         if (type == RoutingType::TIME_ONLY) {
-            response.route.distance_m = distance;
-            response.route.duration_s = duration;
+            response.route.distance_mm = distance_mm;
+            response.route.duration_ms = duration_ms;
         } else if (type == RoutingType::FULL_ROUTE) {
             response.route = convert_json_to_route(std::move(route));
         }
@@ -113,8 +115,8 @@ RoutingResponse Router::operator()(const Pos &origin, const Pos &destination, Ro
 Route convert_json_to_route(osrm::json::Object route_json) {
     Route route;
 
-    route.distance_m = route_json.values["distance"].get<osrm::json::Number>().value;
-    route.duration_s = route_json.values["duration"].get<osrm::json::Number>().value;
+    route.distance_mm = route_json.values["distance"].get<osrm::json::Number>().value * 1000;
+    route.duration_ms = route_json.values["duration"].get<osrm::json::Number>().value * 1000;
 
     auto &legs_json = route_json.values["legs"].get<osrm::json::Array>();
 
@@ -122,8 +124,8 @@ Route convert_json_to_route(osrm::json::Object route_json) {
         auto &leg_json_obejct = leg_json.get<osrm::json::Object>();
 
         Leg leg;
-        leg.distance_m = leg_json_obejct.values["distance"].get<osrm::json::Number>().value;
-        leg.duration_s = leg_json_obejct.values["duration"].get<osrm::json::Number>().value;
+        leg.distance_mm = leg_json_obejct.values["distance"].get<osrm::json::Number>().value * 1000;
+        leg.duration_ms = leg_json_obejct.values["duration"].get<osrm::json::Number>().value * 1000;
 
         auto &steps_json = leg_json_obejct.values["steps"].get<osrm::json::Array>();
 
@@ -131,8 +133,10 @@ Route convert_json_to_route(osrm::json::Object route_json) {
             auto &step_json_obejct = step_json.get<osrm::json::Object>();
 
             Step step;
-            step.distance_m = step_json_obejct.values["distance"].get<osrm::json::Number>().value;
-            step.duration_s = step_json_obejct.values["duration"].get<osrm::json::Number>().value;
+            step.distance_mm =
+                step_json_obejct.values["distance"].get<osrm::json::Number>().value * 1000;
+            step.duration_ms =
+                step_json_obejct.values["duration"].get<osrm::json::Number>().value * 1000;
 
             auto &poses_json = step_json_obejct.values["geometry"]
                                    .get<osrm::json::Object>()
