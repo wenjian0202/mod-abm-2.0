@@ -51,10 +51,6 @@ std::vector<Request> DemandGenerator::operator()(uint64_t target_system_time_ms)
     // Get the last request time. 0 indicates the initial state with no requests generated yet.
     if (last_request_.request_time_ms > 0) {
         if (last_request_.request_time_ms > system_time_ms_) {
-            fmt::print("[DEBUG] T = {}s: Generated {} request(s) in this cycle:\n",
-                       system_time_ms_ / 1000.0,
-                       requests.size());
-
             return requests;
         }
 

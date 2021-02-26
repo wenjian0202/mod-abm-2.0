@@ -50,9 +50,9 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(PlatformConfig _platform_con
     // Open the output datalog file.
     const auto &datalog_config = platform_config_.output_config.datalog_config;
     if (datalog_config.output_datalog) {
-        fout_datalog.open(datalog_config.path_to_output_datalog);
+        datalog_ofstream_.open(datalog_config.path_to_output_datalog);
 
-        fmt::print("[INFO] Open the output datalog file at {}.\n",
+        fmt::print("[INFO] Opened the output datalog file at {}.\n",
                    datalog_config.path_to_output_datalog);
     }
 }
@@ -60,8 +60,10 @@ Platform<RouterFunc, DemandGeneratorFunc>::Platform(PlatformConfig _platform_con
 template <typename RouterFunc, typename DemandGeneratorFunc>
 Platform<RouterFunc, DemandGeneratorFunc>::~Platform() {
     // Close the datalog stream.
-    if (fout_datalog.is_open()) {
-        fout_datalog.close();
+    if (datalog_ofstream_.is_open()) {
+        datalog_ofstream_.close();
+
+        fmt::print("[INFO] Closed the datalog. Program ends.\n");
     }
 }
 
@@ -76,14 +78,10 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_simulation() {
         run_cycle();
     }
 
-    if (platform_config_.output_config.datalog_config.output_datalog) {
-        write_trips_to_datalog();
-    }
-
     // Create report.
-    runtime_ = std::chrono::system_clock::now() - start;
+    std::chrono::duration<double> runtime = std::chrono::system_clock::now() - start;
     fmt::print("[INFO] Simulation completed. Creating report.\n");
-    create_report();
+    create_report(runtime.count());
 
     return;
 };
@@ -94,18 +92,20 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle() {
                system_time_ms_ / 1000.0,
                system_time_ms_ / cycle_ms_);
 
-    // Advance the vehicles frame by frame.
-    for (auto i = 0; i < cycle_ms_; i += frame_ms_) {
-        advance_vehicles();
+    // Advance the vehicles frame by frame in main simulation.
+    if (system_time_ms_ >= main_sim_start_time_ms_ && system_time_ms_ < main_sim_end_time_ms_) {
+        for (auto ms = 0; ms < cycle_ms_; ms += frame_ms_) {
+            advance_vehicles(frame_ms_);
 
-        if (platform_config_.output_config.datalog_config.output_datalog &&
-            system_time_ms_ >= main_sim_start_time_ms_ && system_time_ms_ < main_sim_end_time_ms_) {
-            write_state_to_datalog();
+            if (ms < cycle_ms_ - frame_ms_ &&
+                platform_config_.output_config.datalog_config.output_datalog) {
+                write_to_datalog();
+            }
         }
-
-        fmt::print("[DEBUG] T = {}s: Advanced vehicles by {}s.\n",
-                   system_time_ms_ / 1000.0,
-                   cycle_ms_ / 1000.0);
+    }
+    // Advance the vehicles by the whole cycle in main simulation.
+    else {
+        advance_vehicles(cycle_ms_);
     }
 
     // Generate trips.
@@ -114,23 +114,31 @@ void Platform<RouterFunc, DemandGeneratorFunc>::run_cycle() {
     // Dispatch the pending trips.
     dispatch(pending_trip_ids);
 
+    if (system_time_ms_ > main_sim_start_time_ms_ && system_time_ms_ <= main_sim_end_time_ms_ &&
+        platform_config_.output_config.datalog_config.output_datalog) {
+        write_to_datalog();
+    }
+
     return;
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles() {
+void Platform<RouterFunc, DemandGeneratorFunc>::advance_vehicles(uint64_t time_ms) {
     // Do it for each of the vehicles independently.
     for (auto &vehicle : vehicles_) {
         advance_vehicle(vehicle,
                         trips_,
                         system_time_ms_,
-                        frame_ms_,
+                        time_ms,
                         system_time_ms_ >= main_sim_start_time_ms_ &&
                             system_time_ms_ < main_sim_end_time_ms_);
     }
 
     // Increment the system time.
-    system_time_ms_ += frame_ms_;
+    system_time_ms_ += time_ms;
+
+    fmt::print(
+        "[DEBUG] T = {}s: Advanced vehicles by {}s.\n", system_time_ms_ / 1000.0, time_ms / 1000.0);
 
     return;
 }
@@ -209,8 +217,9 @@ void Platform<RouterFunc, DemandGeneratorFunc>::dispatch(
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::write_state_to_datalog() {
+void Platform<RouterFunc, DemandGeneratorFunc>::write_to_datalog() {
     YAML::Node node;
+
     node["system_time_ms"] = system_time_ms_;
 
     // For each of the vehicles, we write the relavant data in yaml format.
@@ -242,25 +251,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_state_to_datalog() {
         node["vehicles"].push_back(std::move(veh_node));
     }
 
-    YAML::Node node_wrapper;
-    node_wrapper.push_back(node);
-
-    fout_datalog << node_wrapper << std::endl;
-}
-
-template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::write_trips_to_datalog() {
-    YAML::Node node;
-    node["system_time_ms"] = system_time_ms_;
-
     // For each of the trips, we write the relavant data in yaml format.
     for (const auto &trip : trips_) {
-        if (trip.request_time_ms <= main_sim_start_time_ms_) {
-            continue;
-        } else if (trip.request_time_ms > main_sim_end_time_ms_) {
-            break;
-        }
-
         YAML::Node origin_pos_node;
         origin_pos_node["lon"] = fmt::format("{:.6f}", trip.origin.lon);
         origin_pos_node["lat"] = fmt::format("{:.6f}", trip.origin.lat);
@@ -282,14 +274,15 @@ void Platform<RouterFunc, DemandGeneratorFunc>::write_trips_to_datalog() {
         node["trips"].push_back(std::move(trip_node));
     }
 
-    YAML::Node node_wrapper;
-    node_wrapper.push_back(node);
+    datalog_ofstream_ << node << std::endl << "---\n";
 
-    fout_datalog << node_wrapper << std::endl;
+    fmt::print("[DEBUG] T = {}s: Wrote to datalog.\n", system_time_ms_ / 1000.0);
+
+    return;
 }
 
 template <typename RouterFunc, typename DemandGeneratorFunc>
-void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
+void Platform<RouterFunc, DemandGeneratorFunc>::create_report(double total_runtime_s) {
     fmt::print("-----------------------------------------------------------------------------------"
                "-----------------------------\n");
 
@@ -312,8 +305,8 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
     // Simulation Runtime
     fmt::print("# Simulation Runtime\n");
     fmt::print(" - Runtime: total_runtime = {}s, average_runtime_per_simulated_second = {}.\n",
-               runtime_.count(),
-               runtime_.count() * 1000 / system_shutdown_time_ms_);
+               total_runtime_s,
+               total_runtime_s * 1000 / system_shutdown_time_ms_);
 
     // Report trip status
     auto trip_count = 0;
@@ -323,9 +316,9 @@ void Platform<RouterFunc, DemandGeneratorFunc>::create_report() {
     auto total_travel_time_ms = 0;
 
     for (const auto &trip : trips_) {
-        if (trip.request_time_ms <= main_sim_start_time_ms_) {
+        if (trip.request_time_ms < main_sim_start_time_ms_) {
             continue;
-        } else if (trip.request_time_ms > main_sim_end_time_ms_) {
+        } else if (trip.request_time_ms >= main_sim_end_time_ms_) {
             break;
         }
 

@@ -66,13 +66,14 @@ def main():
               "  <arg1> is the path to the platform config file. \n"
               "  <arg2> is the path to the background map image. \n"
               "- Example: python3 {} \"./config/platform.yml\" \"./media/hongkong.png\"\n".format(sys.argv[0]))
-
         sys.exit(1)
 
-    print("Loading the config from {}.".format(sys.argv[1]))
-
+    # Load config.
     config = load_config(sys.argv[1])
 
+    print("Loaded the config from {}.".format(sys.argv[1]))
+
+    # Load boundaries.
     lon_min = config["area_config"]["lon_min"]
     lon_max = config["area_config"]["lon_max"]
     lat_min = config["area_config"]["lat_min"]
@@ -81,28 +82,25 @@ def main():
     print("Loaded boundary: lon_min={}, lon_max={}, lat_min={}, lat_max={}.".format(
         lon_min, lon_max, lat_min, lat_max))
 
+    # Load background image.
     img = Image.open(sys.argv[2])
     w, h = img.size
 
     print("Loaded background map image from {}: width={}, height={}".format(
         sys.argv[2], w, h))
 
+    # Load other data from config.
+    num_frames = int(config["simulation_config"]["simulation_duration_s"] / config["simulation_config"]
+                     ["cycle_s"]) * config["output_config"]["video_config"]["frames_per_cycle"]
+    frame_interval_ms = config["simulation_config"]["cycle_s"] * \
+        1000 / config["output_config"]["video_config"]["frames_per_cycle"]
+    num_vehs = config["mod_system_config"]["fleet_config"]["fleet_size"]
+
     path_to_datalog = config["output_config"]["datalog_config"]["path_to_output_datalog"]
+    print("Rendering video of total {} frames using datalog from {}".format(
+        num_frames, path_to_datalog))
+
     with open(path_to_datalog) as file:
-        datalog = yaml.load(file, Loader=yaml.FullLoader)
-        num_frames = len(datalog) - 1
-
-        assert(num_frames > 0
-               and "The input datalog is empty! Make sure the simulation is run correctly when generating the datalog!")
-
-        num_vehs = len(datalog[0]["vehicles"])
-
-        assert(num_vehs > 0
-               and "The input datalog has no vehicle data! Make sure the simulation is run correctly when generating the datalog!")
-
-        print("Loaded the datalog from {}. It has {} vehicles running for {} frames.".format(
-            path_to_datalog, num_vehs, num_frames))
-
         # Create the plot.
         fig = plt.figure(figsize=(w/DPI, h/DPI), dpi=DPI)
         ax = plt.axes(xlim=(0, w), ylim=(h, 0))
@@ -120,31 +118,48 @@ def main():
         wp2 = []
 
         # Also plot the dispatched trips and the walked away trips.
-        frame_interval_s = config["simulation_config"]["cycle_s"] / \
-            config["output_config"]["video_config"]["frames_per_cycle"]
-        dispatched_trips = ax.plot([], [], 'P', color='darkgreen',
-                                   marker='P', markersize=8, alpha=0.6)[0]
-        walked_away_trips = ax.plot([], [], 'X', color='darkred',
-                                    marker='X', markersize=8, alpha=0.6)[0]
+        dispatched_trips = ax.plot(
+            [], [], 'P', color='darkgreen', marker='P', markersize=8, alpha=0.6)[0]
+        walked_away_trips = ax.plot(
+            [], [], 'X', color='darkred', marker='X', markersize=8, alpha=0.6)[0]
 
         # A text box
         text = ax.text(0.02 * w, 0.95 * h, "text", horizontalalignment='left', verticalalignment='bottom', fontsize=12,
                        bbox=dict(facecolor='white', edgecolor='grey', boxstyle='round', alpha=0.3))
 
-        for id, vehicle in enumerate(datalog[0]["vehicles"]):
+        for id in range(num_vehs):
             # Get the color of the current vehicle. We only color the first 5 vehicles for visibility.
             color = get_color(id)
             vehs.append(ax.plot([], [], color=color,
                                 marker='o', markersize=8, alpha=0.6)[0])
-            wp0.append(ax.plot([], [], linestyle='-', linewidth=2,
-                               color=color, alpha=0.6)[0])
-            wp1.append(ax.plot([], [], linestyle='--', linewidth=2,
-                               color=color, alpha=0.6)[0])
-            wp2.append(ax.plot([], [], linestyle=':', linewidth=2,
-                               color=color, alpha=0.6)[0])
+            wp0.append(ax.plot([], [], linestyle='-',
+                               linewidth=2, color=color, alpha=0.6)[0])
+            wp1.append(ax.plot([], [], linestyle='--',
+                               linewidth=2, color=color, alpha=0.6)[0])
+            wp2.append(ax.plot([], [], linestyle=':',
+                               linewidth=2, color=color, alpha=0.6)[0])
 
+        def init():
+            return vehs, wp0, wp1, wp2, dispatched_trips, walked_away_trips, text
+            
         def animate(n):
-            vehicles = datalog[n]["vehicles"]
+            print("Rendering Frame {} / {} of video...".format(n, num_frames))
+
+            # Load the yaml of the current frame.
+            string = ""
+            while True:
+                line = file.readline()
+                if not line:
+                    print("Reached the end of datalog file before expected! \n")
+                    sys.exit(1)
+                if line == "---\n":
+                    break
+                string += line
+            frame = yaml.safe_load(string)
+            system_time_ms = frame["system_time_ms"]
+
+            # Render vehicles.
+            vehicles = frame["vehicles"]
             for id, vehicle in enumerate(vehicles):
                 vehs[id].set_data(convert_to_x_and_y(
                     vehicle["pos"], lon_min, lon_max, lat_min, lat_max, w, h))
@@ -171,8 +186,7 @@ def main():
                         vehicle["waypoints"][2], lon_min, lon_max, lat_min, lat_max, w, h)
                     wp2[id].set_data(xs, ys)
 
-            system_time_ms = datalog[n]["system_time_ms"]
-            trips = datalog[num_frames]["trips"]
+            # Render trips.
             dispatched_trips_xs = []
             dispatched_trips_ys = []
             walked_away_trips_xs = []
@@ -182,33 +196,33 @@ def main():
             accepted_trips_count = 0
             completed_trips_count = 0
 
-            for trip in trips:
-                if trip["request_time_ms"] >= system_time_ms:
-                    break
+            if "trips" in frame:
+                for trip in frame["trips"]:
+                    if (trip["request_time_ms"] >= config["simulation_config"]["warmup_duration_s"] * 1000):
+                        total_trips_count += 1
 
-                total_trips_count += 1
+                        if trip["status"] != "WALKAWAY":
+                            accepted_trips_count += 1
+                        if trip["status"] == "DROPPED_OFF":
+                            completed_trips_count += 1
 
-                if trip["status"] != "WALKAWAY":
-                    accepted_trips_count += 1
-                if trip["status"] == "COMPLETE":
-                    completed_trips_count += 1
-
-                if trip["status"] == "WALKAWAY":
-                    if trip["request_time_ms"] >= system_time_ms - frame_interval_s:
+                    if trip["status"] == "WALKAWAY":
+                        if trip["request_time_ms"] >= system_time_ms - frame_interval_ms:
+                            x, y = convert_to_x_and_y(
+                                trip["origin"], lon_min, lon_max, lat_min, lat_max, w, h)
+                            walked_away_trips_xs.append(x)
+                            walked_away_trips_ys.append(y)
+                    elif trip["status"] == "DISPATCHED":
                         x, y = convert_to_x_and_y(
                             trip["origin"], lon_min, lon_max, lat_min, lat_max, w, h)
-                        walked_away_trips_xs.append(x)
-                        walked_away_trips_ys.append(y)
-                elif trip["status"] != "COMPLETE" or system_time_ms <= trip["pickup_time_ms"]:
-                    x, y = convert_to_x_and_y(
-                        trip["origin"], lon_min, lon_max, lat_min, lat_max, w, h)
-                    dispatched_trips_xs.append(x)
-                    dispatched_trips_ys.append(y)
+                        dispatched_trips_xs.append(x)
+                        dispatched_trips_ys.append(y)
 
             dispatched_trips.set_data(dispatched_trips_xs, dispatched_trips_ys)
             walked_away_trips.set_data(
                 walked_away_trips_xs, walked_away_trips_ys)
 
+            # Render text.
             text_str = "T = {}s\n{} requested trips ({} accepted, {} completed)".format(
                 system_time_ms / 1000.0,
                 total_trips_count,
@@ -218,10 +232,11 @@ def main():
 
             return vehs, wp0, wp1, wp2, dispatched_trips, walked_away_trips, text
 
-        anime = animation.FuncAnimation(fig, animate, frames=num_frames)
+        anime = animation.FuncAnimation(
+            fig, animate, init_func=init, frames=num_frames)
 
         # Set up formatting for the movie file and write.
-        fps = 1 / frame_interval_s * \
+        fps = 1000 / frame_interval_ms * \
             config["output_config"]["video_config"]["replay_speed"]
         path_to_output_video = config["output_config"]["video_config"]["path_to_output_video"]
         Writer = animation.writers['ffmpeg']

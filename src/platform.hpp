@@ -35,8 +35,8 @@ template <typename RouterFunc, typename DemandGeneratorFunc> class Platform {
     /// \brief Run simulation for one cycle. Invoked repetetively by run_simulation().
     void run_cycle();
 
-    /// \brief Advance all vehicles for the frame time and move forward the system time.
-    void advance_vehicles();
+    /// \brief Advance all vehicles for the given time and move forward the system time.
+    void advance_vehicles(uint64_t time_ms);
 
     /// \brief Generate trips at the end of each cycle.
     std::vector<size_t> generate_trips();
@@ -44,14 +44,11 @@ template <typename RouterFunc, typename DemandGeneratorFunc> class Platform {
     /// \brief Dispatch vehicles to serve pending trips.
     void dispatch(const std::vector<size_t> &pending_trip_ids);
 
-    /// \brief Write the data of the current system state to datalog.
-    void write_state_to_datalog();
-
-    /// \brief Write the data of all trips to datalog after the simulation.
-    void write_trips_to_datalog();
+    /// \brief Write the data of the current simulation state to datalog.
+    void write_to_datalog();
 
     /// \brief Create the report based on the statistical analysis using the simulated data.
-    void create_report();
+    void create_report(double total_runtime_s);
 
     /// \brief The set of config parameters for the simulation platform.
     PlatformConfig platform_config_;
@@ -87,10 +84,7 @@ template <typename RouterFunc, typename DemandGeneratorFunc> class Platform {
     std::vector<Vehicle> vehicles_ = {};
 
     /// \brief The ofstream that outputs to the datalog.
-    std::ofstream fout_datalog;
-
-    /// \brief The total runtime of simulation.
-    std::chrono::duration<double> runtime_;
+    std::ofstream datalog_ofstream_;
 };
 
 // Implementation is put in a separate file for clarity and maintainability.
