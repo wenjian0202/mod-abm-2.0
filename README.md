@@ -21,12 +21,7 @@ Thanks for contributing to `mod-abm-2.0`!
 
 ## `mod-abm-2.0` Explained
 
-The [`main()`](https://github.com/wenjian0202/mod-abm-2.0/blob/main/src/main.cpp) function of the simulation takes three external files as input:
-- platform config file (in `.yml`)
-- pre-processed map data file for [`OSRM`](https://github.com/Project-OSRM/osrm-backend) routing engine (in `.osrm`)
-- demand config file (in `.yml`)
-
-The meat part of the simulation is managed by class `Platform`, which also interacts with two injected functors `Router` and `DemandGenerator`. During the simulation, in each cycle, `Platform` invokes `DemandGenerator` to generate trip requests that follows the Poisson process, based on the pre-defined ODs and trip intensities. It then dispatches the trips to vehicles using the selected dispatching strategies (currently, minimize total wait time). When dispatching, `Router` , which wraps around the `OSRM` backend, is called at high frequency to provide the shortest routes on demand for any origin/destination pair.
+The simulation `Platform` runs in conjunction with a `Router` and a `DemandGenerator`. During the process, in each cycle, `Platform` invokes `DemandGenerator` to generate trip requests based on the pre-defined ODs and trip intensities. It then dispatches the trips to vehicles following the selected dispatching strategies. `Router` , which wraps around the `OSRM` backend, provides the shortest routes for trips during dispatching.
 
 <img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/diagram.svg" width="700">
 
@@ -34,157 +29,30 @@ The program outputs simulation results in two formats:
 - a report as a quick summary of the simulation results (through terminal)
 - a detailed datalog for debugging, visualization and in-depth investigation (in `.yml`)
 
-We also provide Python tools to parse the output datalog and create animation through a two-step process. First, `fetch_map.py` fetches the background map image for the visualization from [OpenStreetMap](https://www.openstreetmap.org/) (you only do it once unless you change the area of study). `render_video.py` then creates animation on top of the background map image using the captured simulation states at each frame from the datalog, and renders video as `.mp4`.
+We also provide Python tools to parse the output datalog and create animation in `.mp4` format. Example of the rendered video can be found at [demo.mp4](https://github.com/wenjian0202/mod-abm-2.0/tree/main/media/demo.mp4).
 
-Example of the input configs, output datalog, as well as the rendered video could be found in the relavant folders ([config](https://github.com/wenjian0202/mod-abm-2.0/tree/main/config), [datalog](https://github.com/wenjian0202/mod-abm-2.0/tree/main/datalog), [media](https://github.com/wenjian0202/mod-abm-2.0/tree/main/media)) of this repo. 
+As of today, `mod-abm-2.0` has the following developped or planned features:
+- Dispatching
+  - Insertion Heuristics, which assigns trips to vehicles while minimizes the total travel time of all travelers
+  - [WIP, High Priority] interface with machine learning libraries for ML-based dispatching
+  - [TBD, Mid Priority] re-optimization through meta-heuristics for better trip-vehicle matching
+  - [TBD, low Priority] rebalancing of idle vehicles for better levels of service
+- Router
+  - `OSRM` routing engine on static map (that stores locally)
+  - [TBD, Low Priority] routing with dynamic traffic data or historic traffic data
+- Demand Generator
+  - time-invariant demand (that generates following Poisson distribution)
+  - [TBD, High Priority] mode choice model that competes with transit and other mode of transportation
+- Others
+  - [TBD, Mid Priority] simulated transit systems for multi-modal simulations 
 
-### Ongoing Parts
+Full documentation of `mod-abm-2.0` can be found below. 
 
-- performance improvement through cached routing results and compressed route representation
-- more debugging printouts, more documentation
+## Ducumentation
 
-### Upcoming Features 
-
-- re-optimization of the vehicle-trip assignment for better MoD performance
-- time-variant demand matrix
-
-## Quick Start
-
-The following guideline applies to MacOS. Linux users should expect very similar approaches.
-
-### Install Dependencies
-
-To start, install [Homebrew](https://brew.sh/), a software package manager that helps install all other dependencies.
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-Install `wget` (and verify `brew` is working properly):
-```
-brew install wget
-```
-And install all other dependencies:
-```
-brew install git 
-brew install cmake python ffmpeg
-brew install boost libzip libxml2 tbb ccache GDAL
-```
-
-:warning:  As of today, `OSRM` ([`v5.24.0`](https://github.com/Project-OSRM/osrm-backend/releases/tag/v5.24.0)) does not work well with the latest `lua` ([`lua@5.4`](https://www.lua.org/versions.html#5.4)) release. We will manually install `lua@5.3` later until `OSRM` supports the new `lua` version.
-
-### Setup OSRM
-
-[`OSRM`](https://github.com/Project-OSRM/osrm-backend) is a high-performance routing engine that runs on [OpenStreetMap](https://www.openstreetmap.org/) data. We  leverage `OSRM` backend libraries in `mod-abm-2.0` for better runtime performance.
-
-We recommend that `OSRM` and its other dependencies are installed in a separate folder, structured as below for maintainability:
-```
-|-- mod-abm-2.0
-|-- osrm
-   |-- map
-   |-- lua-5.3.6
-   |-- osrm-backend
-```
-Start from the desired working directory, we create a `osrm` folder and jump into it.
-```
-mkdir osrm
-cd osrm
-```
-Manually install `lua@5.3`.
-```
-curl -R -O http://www.lua.org/ftp/lua-5.3.6.tar.gz
-tar zxf lua-5.3.6.tar.gz
-cd lua-5.3.6
-make macosx test
-make install
-cd ..
-```
-Clone `osrm-backend` and install it.
-```
-git clone https://github.com/Project-OSRM/osrm-backend.git
-cd osrm-backend
-mkdir build
-cd build
-cmake ..
-make
-make install
-cd ..
-cd ..
-```
-We also need a map that the routing engine (hence our simulation platform) will operate on. The raw [OpenStreetMap](https://www.openstreetmap.org/) map data are encoded in `*.osm.pbf` format and many map extract [servers](https://wiki.openstreetmap.org/wiki/Planet.osm) offers downloading the whole world map or that of a specific region/country. [Protomaps](https://protomaps.com/extracts) is one of the best that allow us to extract rectangular area or draw polygon (good for small case study of city-scale operations). For larger areas (say, California of US, or Germany as a whole), [Geofabrik](https://download.geofabrik.de/) is another good alternative.
- 
-In our case, Hong Kong will be the area of interest (thanks to our HKU partnership!). Make a `map` subfolder: 
-```
-mkdir map
-```
-We download the Hong Kong map extract from [Protomaps](https://protomaps.com/extracts) and name it `hongkong.osm.pbf`. Make sure we have moved the downloaded file into the `osrm/map` subfolder before the following steps.
-
-Several more additional steps are required to pre-process the map data, which largely enhance the routing capabilities by allowing the use of Multi-Level Dijkstra (MLD).
-```
-./osrm-backend/build/osrm-extract ./map/hongkong.osm.pbf -p osrm-backend/profiles/car.lua
-./osrm-backend/build/osrm-partition ./map/hongkong.osrm
-./osrm-backend/build/osrm-customize ./map/hongkong.osrm
-```
-
-### Run `mod-abm-2.0`
-
-Okay, we can now go back to the original working directory and clone the repo.
-```
-cd ..
-git clone https://github.com/wenjian0202/mod-abm-2.0.git
-cd mod-abm-2.0
-```
-To configure the build system, run:
-```
-cmake -S . -B build
-```
-Future builds can be run as simply as:
-```
-cmake --build build
-```
-
-An exmaple command line for running the simulation is:
-```
-./build/main "./config/platform_demo.yml" "../osrm/map/hongkong.osrm" "./config/demand_demo.yml" 1
-```
-Note that the `main()` function takes three compulsory arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the input config files to, for example, change fleet size, or use a different demand matrix. An additional optional argument is the seed to the random number generator. Using the same seed in multiple runs allows for reproducing the same sim results deterministically. If not provided, the system will use the current time as seed (and you end up having fresh results in each new run).
-
-The simulation runs and outputs a report. An example report is found below:
-```
-----------------------------------------------------------------------------------------------------------------
-# System Configurations
- - Simulation Config: simulation_duration = 3000s (main simulation between 1200s and 1800s).
- - Fleet Config: fleet_size = 8, vehicle_capacity = 2.
- - Request Config: max_wait_time = 900s.
- - Output Config: output_datalog = true, render_video = true.
-# Simulation Runtime
- - Runtime: total_runtime = 20.3413s, average_runtime_per_simulated_second = 0.00678044.
-# Trips
- - Total Trips: requested = 12 (of which 10 dispatched [83.3333%] + 2 walked away [16.6667%]).
- - Travel Time: completed = 5. average_wait_time = 521.36s, average_travel_time = 477.921s.
-# Vehicles
- - Distance: average_distance_traveled = 7176.35m. average_distance_traveled_per_hour = 43058.1m.
- - Load: average_load = 1.07387.
-----------------------------------------------------------------------------------------------------------------
-```
-
-Depending on the config, the program may also output the datalog to an `.yml` file. If you are to create animation, run once to fetch the background map image for the given area:
-```
-python3 ./python/fetch_map.py "./config/platform_demo.yml" "./media/hongkong.png"
-```
-We can then create animation for each simulation run (as long as `output_datalog` and `render_video` in config are on) by calling:
-```
-python3 ./python/render_video.py "./config/platform_demo.yml" "./media/hongkong.png"
-```
-You will now have a nice beautiful video clip saved to the desired path. Enjoy!
-
-## Frequently Asked Questions
-
-Q: How the simulation can be even faster?
-
-A: First, for large scale simulations, please make sure to turn off `output_datalog` and `render_video` flags in the platform config. Writing data (expecially those detailed ones for video rendering) to log can be very very expensive. A couple of other options for speeding up simulation are:
-- use a larger cycle (a cycle defines the interval between the periodic dispatching events)
-- use a smaller radius when searching for available vehicles to dispatch (TBD)
-
-Just keep in mind, when trading for speed, we are giving up a little bit of our accuracy and optimality. 
+- [Quick Start](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/quick-start.md) to get started with `mod-abm-2.0`.
+- [Runbook](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/runbook.md) to understand how everything works under the hood and how to set up your own scenarios.
+- [FAQ](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/faq.md) for frequently asked questions.
 
 ## Support
 
