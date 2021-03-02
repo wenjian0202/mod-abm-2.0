@@ -21,13 +21,13 @@ Thanks for contributing to `mod-abm-2.0`!
 
 ## `mod-abm-2.0` Explained
 
-The simulation `Platform` in `mod-abm-2.0` runs in conjunction with a `Router` and a `DemandGenerator`. In each cycle, `Platform` invokes `DemandGenerator` to generate trip requests based on the demand model. It then dispatches the trips to vehicles following the selected dispatching strategies. `Router` , which wraps around the `OSRM` backend, provides the best routes for trips and routing requests during dispatching. Once dispatched, each individual vehicle will navigate itself through the planned waypoints to serve the trips sequenctially. `Platform` accumuates the states along the process, which then helps understand the simulated MoD system from perspectives like fleet usage, level of service etc. 
+The simulation `Platform` in `mod-abm-2.0` runs in conjunction with a `Router` and a `DemandGenerator`. In each cycle, `Platform` invokes `DemandGenerator` to generate trip requests based on the demand model. It then dispatches the trips to vehicles following the selected dispatching strategies. `Router` , which wraps around the `OSRM` backend, provides the best routes for trips and routing requests during dispatching. Once dispatched, each individual vehicle will navigate itself through the planned waypoints to serve the trips sequentially. `Platform` accumuates the states along the process, which then helps understand the simulated MoD system from perspectives like fleet usage, level of service etc. 
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/diagram.svg" width="700">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/diagram.svg" width="800">
 
 The program outputs simulation results in two formats:
-- a report as a quick summary of the simulation results (through terminal)
-- a detailed datalog for debugging, visualization and in-depth investigation (in `.yml` format)
+- a report as a quick summary of the simulation results (through terminal);
+- a detailed datalog for debugging, visualization and in-depth investigation (in `.yml` format).
 
 We also provide Python tools to parse the output datalog and create animation video in `.mp4` format. Example of the rendered video can be found at [demo.mp4](https://github.com/wenjian0202/mod-abm-2.0/tree/main/media/demo.mp4).
 
