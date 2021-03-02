@@ -80,7 +80,7 @@ template <typename RouterFunc, typename DemandGeneratorFunc> class Platform {
     /// \brief The vector of trips created during the entire simulation process.
     std::vector<Trip> trips_ = {};
 
-    /// \brief The vector of trips created during the entire simulation process.
+    /// \brief The vector of vehicles.
     std::vector<Vehicle> vehicles_ = {};
 
     /// \brief The ofstream that outputs to the datalog.

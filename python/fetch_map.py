@@ -8,15 +8,18 @@ import sys
 import yaml
 
 
-# Constants.
+# Max number of tiles allowed in the map image to be fetched.
 MAX_TILES = 128
+# Size in pixels of the single tile.
 TILE_SIZE = 256
+# The url to the OpenStreetMap server.
 TILE_SERVER = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
 
 def get_boundary_from_config(path_to_config_file):
-    """ Load the boundary of the simulated area from config file. """
-    with open("./config/platform.yml") as file:
+    """Load the boundary of the simulated area from config file. """
+
+    with open(path_to_config_file) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
         lon_min = config["area_config"]["lon_min"]
@@ -32,6 +35,7 @@ def deg2num(latitude, longitude, zoom, do_round=True):
     If do_round is True, return integers. Otherwise, return floating point values.
     Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python
     """
+
     lat_rad = np.radians(latitude)
     n = 2.0 ** zoom
     if do_round:
@@ -50,6 +54,7 @@ def deg2num(latitude, longitude, zoom, do_round=True):
             ytile = ytile.astype(np.int32)
         else:
             ytile = int(ytile)
+
     return (xtile, ytile)
 
 
@@ -79,6 +84,7 @@ def fetch_tile(x, y, z):
     png = BytesIO(urlopen(req).read())
     img = Image.open(png)
     img.load()
+
     return img
 
 
@@ -89,18 +95,20 @@ def main():
               "- Usage: python3 <prog name> <arg1> <arg2>. \n"
               "  <arg1> is the path to the platform config file. \n"
               "  <arg2> is the path to the output map image. \n"
-              "- Example: python3 {} \"./config/platform.yml\" \"./media/hongkong.png\"\n".format(sys.argv[0]))
+              "- Example: python3 {} \"./config/platform_demo.yml\" \"./media/hongkong.png\"\n".format(sys.argv[0]))
 
         sys.exit(1)
 
     print("Loading the boundary of the simulated area from config at {}.".format(
         sys.argv[1]))
 
+    # Load the boundary of the area.
     lon_min, lon_max, lat_min, lat_max = get_boundary_from_config(sys.argv[1])
 
     print("Loaded boundary: lon_min={}, lon_max={}, lat_min={}, lat_max={}.".format(
         lon_min, lon_max, lat_min, lat_max))
 
+    # Get max allowed zoom based on the MAX_TILES.
     z = get_allowed_zoom(lon_min, lon_max, lat_min, lat_max)
 
     print("The max zoom for this area is z={}, using TILE_SIZE={} and MAX_TILES={}".format(

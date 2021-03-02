@@ -11,10 +11,12 @@
 DemandGenerator::DemandGenerator(std::string _path_to_demand_data) {
     auto demand_yaml = YAML::LoadFile(_path_to_demand_data);
 
+    // Compute the total number of trips per hour.
     for (const auto &od_yaml : demand_yaml) {
         trips_per_hour_ += od_yaml["trips_per_hour"].as<double>();
     }
 
+    // Generate the ODs with probabilities.
     auto accumucated_trips = 0.0;
 
     for (const auto &od_yaml : demand_yaml) {
@@ -43,12 +45,12 @@ std::vector<Request> DemandGenerator::operator()(uint64_t target_system_time_ms)
            "[ERROR] The target_system_time should be no less than the current system time in "
            "Demand Generator!");
 
-    // System time moves forward by a cycle.
+    // System time moves to the target.
     system_time_ms_ = target_system_time_ms;
 
-    std::vector<Request> requests;
+    std::vector<Request> requests = {};
 
-    // Get the last request time. 0 indicates the initial state with no requests generated yet.
+    // Get the last request time. 0 indicates the initial state with no request generated yet.
     if (last_request_.request_time_ms > 0) {
         if (last_request_.request_time_ms > system_time_ms_) {
             return requests;
@@ -57,7 +59,7 @@ std::vector<Request> DemandGenerator::operator()(uint64_t target_system_time_ms)
         requests.emplace_back(last_request_);
     }
 
-    // Generate new requests until we go beyond this cycle.
+    // Generate new requests until we go beyond the target time.
     while (true) {
         last_request_ = generate_request(last_request_.request_time_ms);
 
@@ -75,7 +77,7 @@ Request DemandGenerator::generate_request(uint64_t last_request_time_ms) {
     // Generate a random number in [0, 1)
     auto rn = rand() / static_cast<double>(RAND_MAX);
 
-    // Based on the accumulated probabilities of each OD, find the corresponding one
+    // Based on the accumulated probabilities of each OD, find the corresponding trip.
     auto od_it = std::lower_bound(ods_.begin(), ods_.end(), rn, [](OdWithProb od, double val) {
         return od.accumulated_prob < val;
     });

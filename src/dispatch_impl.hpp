@@ -13,7 +13,7 @@ template <typename RouterFunc>
 void assign_trips_through_insertion_heuristics(const std::vector<size_t> &pending_trip_ids,
                                                std::vector<Trip> &trips,
                                                std::vector<Vehicle> &vehicles,
-                                               double system_time_ms,
+                                               uint64_t system_time_ms,
                                                RouterFunc &router_func) {
     fmt::print("[DEBUG] Assigning trips to vehicles through insertion heuristics.\n");
 
@@ -31,7 +31,7 @@ template <typename RouterFunc>
 void assign_trip_through_insertion_heuristics(Trip &trip,
                                               const std::vector<Trip> &trips,
                                               std::vector<Vehicle> &vehicles,
-                                              double system_time_ms,
+                                              uint64_t system_time_ms,
                                               RouterFunc &router_func) {
     InsertionResult res;
 
@@ -139,7 +139,7 @@ template <typename RouterFunc>
 InsertionResult compute_cost_of_inserting_trip_to_vehicle(const Trip &trip,
                                                           const std::vector<Trip> &trips,
                                                           const Vehicle &vehicle,
-                                                          double system_time_ms,
+                                                          uint64_t system_time_ms,
                                                           RouterFunc &router_func) {
     InsertionResult ret;
 
@@ -160,7 +160,7 @@ InsertionResult compute_cost_of_inserting_trip_to_vehicle(const Trip &trip,
 
         for (auto dropoff_index = pickup_index; dropoff_index <= num_wps; dropoff_index++) {
             auto [success_this_insert, cost_ms_this_insert] =
-                compute_cost_of_inserting_trip_to_vehicle(
+                compute_cost_of_inserting_trip_to_vehicle_given_pickup_and_dropoff_indices(
                     trip, trips, vehicle, pickup_index, dropoff_index, system_time_ms, router_func);
 
             if (success_this_insert && cost_ms_this_insert - current_cost_ms < ret.cost_ms) {
@@ -177,13 +177,15 @@ InsertionResult compute_cost_of_inserting_trip_to_vehicle(const Trip &trip,
 }
 
 template <typename RouterFunc>
-std::pair<bool, double> compute_cost_of_inserting_trip_to_vehicle(const Trip &trip,
-                                                                  const std::vector<Trip> &trips,
-                                                                  const Vehicle &vehicle,
-                                                                  size_t pickup_index,
-                                                                  size_t dropoff_index,
-                                                                  double system_time_ms,
-                                                                  RouterFunc &router_func) {
+std::pair<bool, uint64_t>
+compute_cost_of_inserting_trip_to_vehicle_given_pickup_and_dropoff_indices(
+    const Trip &trip,
+    const std::vector<Trip> &trips,
+    const Vehicle &vehicle,
+    size_t pickup_index,
+    size_t dropoff_index,
+    uint64_t system_time_ms,
+    RouterFunc &router_func) {
     auto wps = generate_waypoints(
         trip, vehicle, pickup_index, dropoff_index, RoutingType::TIME_ONLY, router_func);
 

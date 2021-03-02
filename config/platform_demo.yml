@@ -9,7 +9,7 @@ area_config:
   lat_max: 22.35
 mod_system_config:
   fleet_config:
-    fleet_size: 50
+    fleet_size: 8
     veh_capacity: 2
     initial_lon: 114.18
     initial_lat: 22.30 
@@ -17,15 +17,15 @@ mod_system_config:
     max_pickup_wait_time_s: 900
 simulation_config:
   cycle_s: 60
-  simulation_duration_s: 1200
+  simulation_duration_s: 600
   warmup_duration_s: 1200
   winddown_duration_s: 1200
 output_config:
   datalog_config:
-    output_datalog: false
-    path_to_output_datalog: "./datalog/datalog.yml"
+    output_datalog: true
+    path_to_output_datalog: "./datalog/demo.yml"
   video_config:
-    render_video: false
+    render_video: true
     path_to_output_video: "./media/demo.mp4"
     frames_per_cycle: 10
     replay_speed: 60.0

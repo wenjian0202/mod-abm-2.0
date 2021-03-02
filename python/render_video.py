@@ -8,12 +8,13 @@ import sys
 import yaml
 
 
-# Constants.
+# Dots per inch, represents the dot density in the output video.
 DPI = 200
 
 
 def load_config(path_to_config_file):
-    """ Load the config in yaml from config file. """
+    """Load the config in yaml from config file."""
+
     with open(path_to_config_file) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -26,6 +27,8 @@ def load_config(path_to_config_file):
 
 
 def convert_to_xs_and_ys(waypoint, lon_min, lon_max, lat_min, lat_max, w, h):
+    """Convert from a list of positions to their x/y coordinates in the image."""
+
     xs = []
     ys = []
 
@@ -37,6 +40,8 @@ def convert_to_xs_and_ys(waypoint, lon_min, lon_max, lat_min, lat_max, w, h):
 
 
 def convert_to_x_and_y(pos, lon_min, lon_max, lat_min, lat_max, w, h):
+    """Convert from a pos to its x/y coordinates in the image."""
+
     x = (pos["lon"] - lon_min) / (lon_max - lon_min) * w
     y = (lat_max - pos["lat"]) / (lat_max - lat_min) * h
 
@@ -44,6 +49,8 @@ def convert_to_x_and_y(pos, lon_min, lon_max, lat_min, lat_max, w, h):
 
 
 def get_color(id):
+    """Get color of vehicle given its id. We only color the first five vehicles."""
+
     color = "0.50"
     if id == 0:
         color = "#dc241f"
@@ -55,6 +62,7 @@ def get_color(id):
         color = "#0098d8"
     elif id == 4:
         color = "#b26300"
+
     return color
 
 
@@ -65,7 +73,7 @@ def main():
               "- Usage: python3 <prog name> <arg1> <arg2>. \n"
               "  <arg1> is the path to the platform config file. \n"
               "  <arg2> is the path to the background map image. \n"
-              "- Example: python3 {} \"./config/platform.yml\" \"./media/hongkong.png\"\n".format(sys.argv[0]))
+              "- Example: python3 {} \"./config/platform_demo.yml\" \"./media/hongkong.png\"\n".format(sys.argv[0]))
         sys.exit(1)
 
     # Load config.
@@ -141,7 +149,7 @@ def main():
 
         def init():
             return vehs, wp0, wp1, wp2, dispatched_trips, walked_away_trips, text
-            
+
         def animate(n):
             print("Rendering Frame {} / {} of video...".format(n, num_frames))
 

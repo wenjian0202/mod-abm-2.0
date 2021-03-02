@@ -57,9 +57,9 @@ enum class RoutingStatus {
 
 /// \brief The response from the routing engine.
 struct RoutingResponse {
-    RoutingStatus status = RoutingStatus::UNDEFINED;
-    std::string message = "";
-    Route route;
+    RoutingStatus status = RoutingStatus::UNDEFINED; // the status
+    std::string message = ""; // message from the router, in case it does not return a good route
+    Route route;              // the route
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,15 +15,15 @@ class DemandGenerator {
     /// \brief Constructor.
     explicit DemandGenerator(std::string _path_to_demand_data);
 
-    /// \brief Main functor that generates the requests until the target system time.
+    /// \brief Main functor that generates the requests til the target system time.
     std::vector<Request> operator()(uint64_t target_system_time_ms);
 
   private:
-    /// \brief Generate a request following the Poisson process and trip intensities.
+    /// \brief Generate a request following the Poisson process.
     /// \see the definition of OdWithProb for detailed explaination.
     Request generate_request(uint64_t last_request_time_ms);
 
-    /// \brief The time of the last request.
+    /// \brief The last request the system has generated.
     Request last_request_ = {};
 
     /// \brief The system time starting from 0.
@@ -33,6 +33,6 @@ class DemandGenerator {
     /// \see the definition of OdWithProb for detailed explaination.
     std::vector<OdWithProb> ods_ = {};
 
-    /// \brief The time of the last request.
+    /// \brief The total trip itensity represented by average number of trips per hour.
     double trips_per_hour_ = 0.0;
 };

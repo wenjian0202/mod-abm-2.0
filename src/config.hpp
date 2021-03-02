@@ -17,29 +17,29 @@ struct AreaConfig {
 struct FleetConfig {
     size_t fleet_size = 10;  // fleet size
     size_t veh_capacity = 2; // vehicle capacity, 1 = non-shared, >2 is shared
-    float initial_lon = 0.0; // max longitude accepted
-    float initial_lat = 0.0; // min longitude accepted
+    float initial_lon = 0.0; // initial longitude of the vehicle
+    float initial_lat = 0.0; // initial latitude of the vehicle
 };
 
 /// \brief Config that describes the requests.
 struct RequestConfig {
-    double max_pickup_wait_time_s =
-        600; // the max wait time allowed before a traveler is picked up.
+    double max_pickup_wait_time_s = 600; // the max wait time allowed between a request is generated
+                                         // and the traveler is picked up
 };
 
-/// \brief Config that describes the target MoD system.
+/// \brief Config that describes the simulated MoD system.
 struct MoDSystemConfig {
     FleetConfig fleet_config;
     RequestConfig request_config;
 };
 
-/// \brief Config that describes the simulation statistics.
+/// \brief Config that describes the simulation parameters.
 struct SimulationConfig {
     double cycle_s = 600; // the cycle every x second the platform dispatches the requests in batch
     double simulation_duration_s =
-        600;                         // the main period during which the simulated data are analyzed
-    double warmup_duration_s = 1200; // the period before the main sim for system to build up states
-    double winddown_duration_s = 1200; // the period after the main sim for system to close trips
+        600; // the main period during which the simulated data is used for analysis
+    double warmup_duration_s = 1200;   // the period before the main sim to build up states
+    double winddown_duration_s = 1200; // the period after the main sim to close trips
 };
 
 /// \brief Config for the output datalog.
@@ -70,5 +70,5 @@ struct PlatformConfig {
     OutputConfig output_config;
 };
 
-/// \brief Load yaml platform config and convert into the c++ data struct.
+/// \brief Load yaml platform config and convert into the C++ data struct.
 PlatformConfig load_platform_config(const std::string &path_to_platform_config);

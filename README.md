@@ -1,7 +1,7 @@
 # `mod-abm-2.0` 
 A modern agent-based modeling platform for mobility-on-demand simulations.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/demo.gif" width="700">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/hongkong.gif" width="700">
 
 ## What's `mod-abm-2.0`?
 
@@ -28,7 +28,7 @@ The [`main()`](https://github.com/wenjian0202/mod-abm-2.0/blob/main/src/main.cpp
 
 The meat part of the simulation is managed by class `Platform`, which also interacts with two injected functors `Router` and `DemandGenerator`. During the simulation, in each cycle, `Platform` invokes `DemandGenerator` to generate trip requests that follows the Poisson process, based on the pre-defined ODs and trip intensities. It then dispatches the trips to vehicles using the selected dispatching strategies (currently, minimize total wait time). When dispatching, `Router` , which wraps around the `OSRM` backend, is called at high frequency to provide the shortest routes on demand for any origin/destination pair.
 
-<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/media/diagram.svg" width="700">
+<img src="https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/diagram.svg" width="700">
 
 The program outputs simulation results in two formats:
 - a report as a quick summary of the simulation results (through terminal)
@@ -143,7 +143,7 @@ cmake --build build
 
 An exmaple command line for running the simulation is:
 ```
-./build/main "./config/platform.yml" "../osrm/map/hongkong.osrm" "./config/demand.yml" 1
+./build/main "./config/platform_demo.yml" "../osrm/map/hongkong.osrm" "./config/demand_demo.yml" 1
 ```
 Note that the `main()` function takes three compulsory arguments: platform config file, pre-processed map data file (in `.osrm` format, not to confuse with the raw `.osm.pbf` file) and demand config file. You can customize the input config files to, for example, change fleet size, or use a different demand matrix. An additional optional argument is the seed to the random number generator. Using the same seed in multiple runs allows for reproducing the same sim results deterministically. If not provided, the system will use the current time as seed (and you end up having fresh results in each new run).
 
@@ -151,28 +151,28 @@ The simulation runs and outputs a report. An example report is found below:
 ```
 ----------------------------------------------------------------------------------------------------------------
 # System Configurations
- - Simulation Config: simulation_duration = 3000s (1200s warm-up + 600s main + 1200s wind-down).
+ - Simulation Config: simulation_duration = 3000s (main simulation between 1200s and 1800s).
  - Fleet Config: fleet_size = 8, vehicle_capacity = 2.
  - Request Config: max_wait_time = 900s.
  - Output Config: output_datalog = true, render_video = true.
 # Simulation Runtime
- - Runtime: total_runtime = 35.6115s, average_runtime_per_simulated_second = 0.0118705.
+ - Runtime: total_runtime = 20.3413s, average_runtime_per_simulated_second = 0.00678044.
 # Trips
- - Total Trips: requested = 12 (of which 9 dispatched [75%] + 3 walked away [25%]).
- - Travel Time: completed = 6. average_wait_time = 777.545s, average_travel_time = 390.767s.
+ - Total Trips: requested = 12 (of which 10 dispatched [83.3333%] + 2 walked away [16.6667%]).
+ - Travel Time: completed = 5. average_wait_time = 521.36s, average_travel_time = 477.921s.
 # Vehicles
- - Distance: average_distance_traveled = 7327.46m. average_distance_traveled_per_hour = 43964.8m.
- - Load: average_load = 1.08141.
+ - Distance: average_distance_traveled = 7176.35m. average_distance_traveled_per_hour = 43058.1m.
+ - Load: average_load = 1.07387.
 ----------------------------------------------------------------------------------------------------------------
 ```
 
 Depending on the config, the program may also output the datalog to an `.yml` file. If you are to create animation, run once to fetch the background map image for the given area:
 ```
-python3 ./python/fetch_map.py "./config/platform.yml" "./media/hongkong.png"
+python3 ./python/fetch_map.py "./config/platform_demo.yml" "./media/hongkong.png"
 ```
 We can then create animation for each simulation run (as long as `output_datalog` and `render_video` in config are on) by calling:
 ```
-python3 ./python/render_video.py "./config/platform.yml" "./media/hongkong.png"
+python3 ./python/render_video.py "./config/platform_demo.yml" "./media/hongkong.png"
 ```
 You will now have a nice beautiful video clip saved to the desired path. Enjoy!
 

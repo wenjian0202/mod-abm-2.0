@@ -22,10 +22,11 @@ int main(int argc, const char *argv[]) {
                    "  <arg1> is the path to the platform config file. \n"
                    "  <arg2> is the path to the orsm map data. \n"
                    "  <arg3> is the path to the demand config file. \n"
-                   "  <arg4> is the seed to the random number generator. If not provided, rand() "
+                   "  <arg4> is the seed (unsigned int) to the random number generator. If not "
+                   "provided, rand() "
                    "will use the current time as seed.\n"
-                   "- Example: {} \"./config/platform.yml\" \"../osrm/map/hongkong.osrm\" "
-                   "\"./config/demand.yml\" 1\n",
+                   "- Example: {} \"./config/platform_demo.yml\" \"../osrm/map/hongkong.osrm\" "
+                   "\"./config/demand_demo.yml\" 1\n",
                    argv[0]);
         return -1;
     }

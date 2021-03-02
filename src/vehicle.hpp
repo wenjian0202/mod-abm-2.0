@@ -14,11 +14,13 @@ void truncate_leg_by_time(Leg &leg, uint64_t time_ms);
 /// \brief Trucate Route so that the first x milliseconds worth of route is completed.
 void truncate_route_by_time(Route &route, uint64_t time_ms);
 
-/// \brief Advance the vehicle by x second so that the first x milliseconds worth of route is
-/// completed. \param vehicle the vehicle that contains waypoints to be processed. \param trips the
-/// reference to the trips. \param system_time_s the current system time in milliseconds. \param
-/// time_s the time in seconds that we need to advance the system. \param update_vehicle_stats true
-/// if we update the vehicle statistics including distance traveled.
+/// \brief Advance the vehicle by x milliseconds .
+/// \param vehicle the vehicle that contains waypoints to be processed.
+/// \param trips the reference to the trips.
+/// \param system_time_ms the current system time in milliseconds.
+/// \param time_ms the time in seconds that we need to advance the system.
+/// \param update_vehicle_stats true if we update the vehicle statistics including distance
+/// traveled and loaded distance traveled.
 void advance_vehicle(Vehicle &vehicle,
                      std::vector<Trip> &trips,
                      uint64_t system_time_ms,
