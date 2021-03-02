@@ -11,9 +11,12 @@ This function takes three compulsory external files as input:
 - a platform config file (in `.yml`  format)
 - a pre-processed map data file for [`OSRM`](https://github.com/Project-OSRM/osrm-backend) routing engine (in `.osrm` format, not to confuse with the raw `.osm.pbf` data extract directly downloaded from OSM servers)
 - a demand config file (in `.yml` format)
-You can customize the each of the input config files to, for example, switch to a different area, modify fleet size and vehicle capacity, or use a different demand matrix. One more optional argument, in addition to the three compulsory ones, is the seed (an unsigned integer) for the random number generator. Using the same seed in multiple runs allows for reproducing the same sim results deterministically. If not provided, the simulation will use the current time as seed (and you end up having fresh results in each new run).
 
-The simulation runs and outputs a report that summerizes the system performance such as runtime and average travel time. An example report is found below:
+You can customize the each of the input config files to, for example, switch to a different area, modify fleet size and vehicle capacity, or use a different demand matrix. 
+
+One more optional argument, in addition to the three compulsory ones, is the seed (an unsigned integer) for the random number generator. Using the same seed in multiple runs allows for reproducing the same sim results deterministically. If not provided, the simulation will use the current time as seed (and you end up having fresh results in each new run).
+
+The simulation runs and outputs a report that summarizes the system performance such as runtime and average travel time. An example report is found below:
 ```
 ----------------------------------------------------------------------------------------------------------------
 # System Configurations
@@ -64,9 +67,10 @@ After dispatching, each individual vehicle will navigate itself through the plan
 
 To set up your own scenario of MoD simulation, here is a list of all that are required:
 - Select your area of interest, defined as the max/min longitudes and latitudes, and download the `*.osm.pbf` extract from a server such as [Protomaps](https://protomaps.com/extracts) or [Geofabrik](https://download.geofabrik.de/) that covers the entire area.
-- Pre-process your map extract. You will run three command lines, `osrm-extract`, `osrm-partition` and `osrm-customize`, sequentially and the end result is a `*.osrm` file (see [QuickStart](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/QUICKSTART.md)).
+- Pre-process your map extract. You will run three command lines, `osrm-extract`, `osrm-partition` and `osrm-customize`, sequentially and the end result is a `*.osrm` file (see [Quick Start](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/QUICKSTART.md)).
 - Customize your platform config with your own fleet definition, request patterns etc (and make sure the max/min lon/lat are consistent!).
 - Create your own demand config with a list of expected trip origins and destination, and their intensities.
-...and that is it! Run `main()` with your own configs/map to see how this is like and have fun! 
+
+...and that is it! Run `main()` with your own configs/map to see how this is like. Have fun! 
 
 Questions？Please check out our [FAQ](https://github.com/wenjian0202/mod-abm-2.0/blob/main/doc/FAQ.md). You can also post bug reports and feature requests in [Issues](https://github.com/wenjian0202/mod-abm-2.0/issues).
